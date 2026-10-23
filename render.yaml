@@ -1,0 +1,48 @@
+# Free tier only: one web service and one Postgres. Every scheduled job (ingest, alerts, mailer, simulator)
+# runs on GitHub Actions instead of a paid Render background worker; see .github/workflows/ and docs/RENDER.md.
+databases:
+  - name: downstream-db
+    plan: free
+    region: singapore          # closest Render region to India; change if a different one benchmarks faster
+
+services:
+  - type: web
+    name: downstream-web
+    runtime: docker
+    dockerfilePath: services/api/Dockerfile
+    dockerContext: .
+    plan: free
+    region: singapore
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase: { name: downstream-db, property: connectionString }
+      - key: NODE_ENV
+        value: production
+      - key: PUBLIC_BASE_URL
+        sync: false            # set to the Render-assigned URL after first deploy, e.g. https://downstream-web.onrender.com
+      - key: EMAIL_DRIVER
+        value: smtp
+      - key: SMTP_URL
+        sync: false            # the web service sends confirmation emails; never commit this value
+      - key: EMAIL_FROM
+        sync: false
+      - key: CONTACT_EMAIL
+        sync: false            # secrets can't live in an env group (Render ignores sync: false there)
+      - fromGroup: shared-config
+
+envVarGroups:
+  - name: shared-config
+    envVars:
+      - key: MOCK_MODE
+        value: "true"          # keep the simulation band, test point and /api/dev/simulate in the demo
+      - key: MOCK_LAT
+        value: "16.18"
+      - key: MOCK_LNG
+        value: "75.70"
+      - key: WQMIS_STATES
+        value: "15"
+      - key: WQMIS_DISTRICTS
+        value: "187"
+      - key: RIVER_CRITERIA_CLASS
+        value: "C"

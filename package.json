@@ -1,0 +1,28 @@
+{
+  "name": "downstream",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "services/*",
+    "web"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "build": "npm run build --workspace web",
+    "start": "node services/api/server.js",
+    "start:worker": "node services/worker/index.js",
+    "test": "node --test \"packages/**/*.test.js\" \"services/**/test/*.test.js\"",
+    "test:integration": "node --test services/worker/test/integration.int.js",
+    "migrate": "node services/api/migrate.js",
+    "db:reset": "docker compose down -v && docker compose up -d db && docker compose run --rm migrate",
+    "db:psql": "docker compose exec db psql -U water -d water",
+    "probe:cpcb": "node scripts/probe/probe-cpcb.mjs",
+    "probe:wqmis": "node scripts/probe/probe-wqmis.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "1.63.0"
+  }
+}

@@ -1,0 +1,102 @@
+name: downstream
+
+# Local mirror of the Render layout (web + worker + Postgres), plus dev-only helpers:
+# Vite dev server (hot reload), Mailpit (dev inbox) and Adminer (SQL browser).
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: water
+      POSTGRES_PASSWORD: water
+      POSTGRES_DB: water
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U water -d water"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    build: { context: ., dockerfile: services/api/Dockerfile }
+    command: ["node", "services/api/migrate.js"]
+    env_file: .env
+    depends_on:
+      db: { condition: service_healthy }
+    restart: "no"
+
+  api:
+    build: { context: ., dockerfile: services/api/Dockerfile }
+    env_file: .env
+    ports: ["8080:8080"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      mailpit: { condition: service_started }
+    restart: unless-stopped
+
+  worker:
+    build: { context: ., dockerfile: services/worker/Dockerfile }
+    env_file: .env
+    volumes:
+      - ./data:/repo/data          # raw-response archive (data/raw) and geocode-overrides.csv
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      mailpit: { condition: service_started }
+    restart: unless-stopped
+
+  web:
+    build: { context: ., dockerfile: web/Dockerfile.dev }
+    environment:
+      API_PROXY_TARGET: http://api:8080
+      VITE_POLL: "true"            # file events don't cross the Windows bind mount; poll instead
+    ports: ["5173:5173"]
+    volumes:
+      - ./web/src:/repo/web/src
+      - ./web/public:/repo/web/public
+      - ./web/index.html:/repo/web/index.html
+    depends_on: [api]
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+  adminer:
+    image: adminer
+    ports: ["8081:8080"]
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    depends_on: [db]
+
+  # Unit tests inside Docker: docker compose run --rm test
+  test:
+    build: { context: ., dockerfile: services/api/Dockerfile, target: build }
+    command: ["npm", "test"]
+    env_file: .env
+    profiles: ["test"]
+    depends_on:
+      db: { condition: service_healthy }
+
+  # Browser checks and Phase 7 screenshots against the production build:
+  #   docker compose --profile e2e run --rm e2e          (add "shots" for screenshots only)
+  e2e:
+    image: mcr.microsoft.com/playwright:v1.63.0-noble
+    working_dir: /repo
+    volumes:
+      - .:/repo
+    # Share the api container's network so the site is http://localhost:8080: a secure context, which
+    # geolocation needs (production is HTTPS; dev is localhost too).
+    network_mode: "service:api"
+    environment:
+      BASE_URL: http://localhost:8080
+      MAILPIT_URL: http://mailpit:8025
+    entrypoint: ["node", "scripts/e2e/run.mjs"]
+    ipc: host
+    profiles: ["e2e"]
+    depends_on: [api, mailpit]
+
+volumes:
+  pgdata:

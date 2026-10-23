@@ -1,0 +1,61 @@
+{
+  "at": "2026-10-23T09:52:17.809Z",
+  "base": "http://localhost:8080",
+  "results": [
+    {
+      "name": "screenshots: 1440 px and 390 px, light and dark",
+      "ok": true,
+      "ms": 70570
+    },
+    {
+      "name": "hero sentence is live, dated and names its water",
+      "ok": true,
+      "ms": 4494
+    },
+    {
+      "name": "keyboard only: skip link, list, station panel, alerts pin, subscribe",
+      "ok": true,
+      "ms": 6718
+    },
+    {
+      "name": "keyboard only: use my location, nearby list, panchayat rulers",
+      "ok": true,
+      "ms": 6098
+    },
+    {
+      "name": "location refused: search for a place instead",
+      "ok": true,
+      "ms": 5356
+    },
+    {
+      "name": "testing: \"Use the simulation test point\" and a \"testing\" search both pin the simulation point",
+      "ok": true,
+      "ms": 5403
+    },
+    {
+      "name": "map click drops a pin; radius slider redraws; form errors explain what to do",
+      "ok": true,
+      "ms": 5412
+    },
+    {
+      "name": "double opt-in, simulated urgent alert within a minute, one-click unsubscribe",
+      "ok": true,
+      "ms": 12063
+    },
+    {
+      "name": "phone: map on top, bottom sheet snaps, place selection opens the sheet",
+      "ok": true,
+      "ms": 5700
+    },
+    {
+      "name": "reduced motion: no pinned scroll sequence, steps shown statically",
+      "ok": true,
+      "ms": 4458
+    },
+    {
+      "name": "freshness ledger lists each source with fetch time, newest data and records",
+      "ok": true,
+      "ms": 4519
+    }
+  ]
+}

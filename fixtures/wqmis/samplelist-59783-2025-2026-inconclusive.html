@@ -1,0 +1,751 @@
+
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>JJM-WQMIS</title>
+    <link rel="shortcut icon" href="/WQMIS/Image/favicon.ico">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <link rel="stylesheet" href="/WQMIS/admin/css/bootstrap.min.css">
+    <link href="/WQMIS/admin/css/font-awesome.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="/WQMIS/admin/css/all-skins.min.css">
+    <link href="/WQMIS/admin/css/AdminLTE.min.css" rel="stylesheet" />
+    <script src="/WQMIS/Scripts/jquery.min.js"></script>
+        <script src="/WQMIS/admin/Js/bootstrap.min.js"></script>
+
+    <script src="/WQMIS/admin/Js/adminlte.min.js"></script>
+    <link href="/WQMIS/admin/css/w3.css" rel="stylesheet" />
+    <script src="/WQMIS/admin/Js/SHA512.js"></script>
+    <link href="/WQMIS/admin/Datatable/jquery.dataTables.min.css" rel="stylesheet" />
+
+    <script src="/WQMIS/Scripts/frmValidate.js"></script>
+
+
+    <link href="/WQMIS/Content/datatable/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="/WQMIS/admin/Datatable/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="/WQMIS/admin/Datatable/jquery.dataTables.min.js"></script>
+    <link href="/WQMIS/admin/Datatable/buttons.dataTables.min.css" rel="stylesheet" />
+    <script src="/WQMIS/admin/Datatable/dataTables.buttons.min.js"></script>
+
+
+    
+    <script src="/WQMIS/Content/datatable/dataTables.buttons.js"></script>
+    <script src="/WQMIS/Content/datatable/buttons.html5.js"></script>
+    <script src="/WQMIS/Content/datatable/buttons.print.js"></script>
+    
+
+
+    <script src="/WQMIS/admin/Datatable/jszip.min.js"></script>
+    <script src="/WQMIS/admin/Datatable/pdfmake.min.js"></script>
+    <script src="/WQMIS/admin/Datatable/vfs_fonts.js"></script>
+    <script src="/WQMIS/Scripts/globalFinYear.js"></script>
+
+    <link href="/WQMIS/Content/grid.css" rel="stylesheet" />
+    <style>
+
+        li.treeview.menu-open a {
+            border-left-color: #43daff !important;
+        }
+
+
+
+        .skin-blue .sidebar-menu > li:hover > a, .skin-blue .sidebar-menu > li.active > a, .skin-blue .sidebar-menu > li.menu-open > a {
+            border-left-color: #43daff !important;
+        }
+
+
+        .treeview.menu-open > .treeview-menu {
+            display: block;
+        }
+    </style>
+
+    <script src="/WQMIS/Content/kendo.all.min.js"></script>
+    <script src="/WQMIS/Content/Print.js"></script>
+
+    <script type="text/javascript">
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+    </script>
+
+    <script>
+        jQuery(function ($) {
+            //var path = window.location.href;
+            var path = window.location.href.replace(/#/g, '');
+            // because the 'href' property of the DOM element is the absolute path
+            $('ul a').each(function () {
+                if (this.href === path) {
+                    $(this).addClass('active_menu-open');
+                }
+            });
+        });
+        $(document).ready(function () {
+            $(".active_menu-open").parentsUntil("treeview").addClass("menu-open");
+            //let tk = sessionStorage.getItem("GGTRYU-e664a07a-9c5d-49ba-98ed-fabe9c6f58bb");
+            //$.ajax({
+            //    type: "GET",
+            //    asnc: false,
+            //    url: '/Home/chtk',
+            //      headers: { "tk": tk },
+            // /*   data: {tk:tk},*/
+            //    success: function (data) {
+            //        debugger;
+            //        if (!data) {
+            //            alert();
+            //            var url = "../Error/Error";
+            //            window.location.href = $(location).attr('host') + '/Error/Error';
+            //            sessionStorage.clear();
+            //        }
+            //    },
+            //    error: function () {
+            //        var url = "../Error/Error";
+            //        window.location.href = url;
+            //        sessionStorage.clear();
+            //    }
+
+            //});
+
+
+
+            function ajaxindicatorstart(text) {
+                if ($('body').find('#resultLoading').attr('id') != 'resultLoading') {
+                    $('body').append('<div id="resultLoading" style="display:none"><div><div id="cssload-loader"><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div></div><div>' + text + '</div></div><div class="bg"></div></div>');
+                }
+                $('#resultLoading').css({
+                    'width': '100%',
+                    'height': '100%',
+                    'position': 'fixed',
+                    'z-index': '10000000',
+                    'top': '0',
+                    'left': '0',
+                    'right': '0',
+                    'bottom': '0',
+                    'margin': 'auto'
+                });
+                $('#resultLoading .bg').css({
+                    'background': '#000000',
+                    'opacity': '0.7',
+                    'width': '100%',
+                    'height': '100%',
+                    'position': 'absolute',
+                    'top': '0'
+                });
+                $('#resultLoading>div:first').css({
+                    'width': '250px',
+                    'height': '75px',
+                    'text-align': 'center',
+                    'position': 'fixed',
+                    'top': '0',
+                    'left': '0',
+                    'right': '0',
+                    'bottom': '0',
+                    'margin': 'auto',
+                    'font-size': '16px',
+                    'z-index': '10',
+                    'color': '#ffffff'
+
+                });
+                $('#resultLoading .bg').height('100%');
+                $('#resultLoading').fadeIn(300);
+                $('body').css('cursor', 'wait');
+            }
+            function ajaxindicatorstop() {
+                $('#resultLoading .bg').height('100%');
+                $('#resultLoading').fadeOut(300);
+                $('body').css('cursor', 'default');
+            }
+            $(document).ajaxStart(function () {
+                var hideajax = 0;
+                hideajax = document.getElementById("txthideajax");
+                if (hideajax == null) {
+                    ajaxindicatorstart('Processing.. please wait..');
+                }
+            }).ajaxStop(function () {
+                ajaxindicatorstop();
+            });
+            //$(document).ajaxError(function () {
+            //    let url = "../Error/Error";
+            //    window.open(url, "_self");
+            //});
+           if(13 == 7 || 13 == 4)
+                Getlanguage();
+            if(13 == 10)
+                Getlanguage();
+
+
+
+               if ('' == 'False' && 13 == 2)
+                      $(".sidebar-menu").css("display", "none");
+             else
+                       $(".sidebar-menu").css("display", "block");
+
+            $("#ddllanguage").change(function () {
+
+                let lang = $("#ddllanguage option:selected").val();
+                var url1 = window.location.href;
+                let url = "../Common/ChangeLanguage?lang=" + lang + "&url=" + url1 + " ";
+                localStorage.setItem("lang", lang);
+                setCookie('lang', lang)
+                window.open(url, "_self");
+            });
+
+
+
+
+        });
+
+
+        function setCookie(key, value, days) {
+            var expires = new Date();
+            expires.setTime(expires.getTime() + 31536000000); //1 year
+            document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+        }
+
+        function Getlanguage() {
+            var url = "../Common/Getlanguage/";
+            $.ajax({
+                url: url,
+
+                cache: false,
+                type: "POST",
+                async: false,
+                success: function (data) {
+
+                    if (data.length > 0) {
+                        var markup = '';
+                        for (var x = 0; x < data.length; x++) {
+                            markup += "<option value=" + data[x].LanguageCultureName + ">" + data[x].LanguageFullName + "</option>";
+
+                        }
+                        $("#ddllanguage").html(markup).show();
+
+                    }
+                    else {
+                        $("#ddllanguage").empty();
+
+                    }
+
+                },
+
+            });
+            ;
+            let lg = localStorage.getItem("lang");
+            $("#ddllanguage").val(lg);
+        }
+
+    </script>
+
+    <script>
+        //function GetExcelContent() {
+
+        //    $("input[name='GridHtml']").val($("#printpage").html());
+
+        //    $("input[name='FileName']").val($("#ReportHeading").html());
+        //}
+        function GetExcelContent() {
+            if ($('#printpage .post_m').is(":hidden") == true) {
+                $("#hdnhtml").html($("#printpage").html());
+                $("#hdnhtml").css("display", "block");
+                $("#hdnhtml").find('.post_m').remove();
+                $("input[name='GridHtml']").val($("#hdnhtml").html());
+                $("#hdnhtml").html('');
+                $("#hdnhtml").css("display", "none");
+            }
+            else {
+                $("input[name='GridHtml']").val($("#printpage").html());
+            }
+            /* $("input[name='GridHtml']").val($("#hdnhtml").html());*/
+            $("input[name='FileName']").val($("#ReportHeading").html());
+        }
+
+        function GetExcelContent1() {
+            if ($('#printpage1 .post_m').is(":hidden") == true) {
+                $("#hdnhtml1").html($("#printpage1").html());
+                $("#hdnhtml1").css("display", "block");
+                $("#hdnhtml1").find('.post_m').remove();
+                $("input[name='GridHtml1']").val($("#hdnhtml1").html());
+                $("#hdnhtml1").html('');
+                $("#hdnhtml1").css("display", "none");
+            }
+            else {
+                $("input[name='GridHtml1']").val($("#printpage1").html());
+            }
+            /* $("input[name='GridHtml']").val($("#hdnhtml").html());*/
+            $("input[name='FileName1']").val($("#ReportHeading1").html());
+        }
+
+
+        function ExporttablePdf2() {
+
+            $("#hdnheading").show();
+            $("#hdnfooter").show();
+            // $(".grid-footer").hide();
+            var printDate = $("#spndatetime").html();
+            $("#printDate").text('Printed on : ' + printDate);
+
+
+            var FileName = $("#ReportHeading").html();
+
+            kendo.drawing.drawDOM("#printpage",
+                {
+                    paperSize: "A4",
+                    //landscape: true,
+                    margin: { left: ".5cm", top: ".1cm", right: ".5cm", bottom: ".1cm" },
+                    scale: 0.5,
+                    height: 500,
+                    repeatHeaders: true
+                })
+                .then(function (group) {
+                    $("#hdnheading").hide();
+                    $("#hdnfooter").hide();
+                    $("#printpage a").addClass("href").css("cursor", "pointer");
+                    return kendo.drawing.exportPDF(group, {
+                        paperSize: "a4",
+                        margin: { left: ".5cm", top: ".1cm", right: ".5cm", bottom: ".1cm" },
+                    }).done(function (data) {
+                        kendo.saveAs({
+                            dataURI: data,
+                            fileName: FileName + ".pdf"
+                        });
+                    });
+                });
+        }
+    </script>
+
+
+    <style>
+        .wqmis_menu .active a {
+            border-left-color: #3c8dbc;
+        }
+
+
+        li.menu-open > a {
+            border-left-color: #00c0ef !important;
+        }
+
+        ::selection {
+            color: #fff;
+            background: #2d8efe;
+            /* font-size: 14px;*/
+        }
+
+        ::-moz-selection {
+            color: #fff;
+            background: #2d8efe;
+            /*font-size: 14px;*/
+        }
+    </style>
+
+</head>
+
+<body class="hold-transition skin-blue sidebar-mini">
+
+
+    <div class="wrapper">
+        <div id="hdnhtml" style="display:none;"></div>
+        <header class="main-header">
+            <a href="#" class="logo">
+                <span class="logo-mini"></span>
+                <span class="logo-lg"><b>JJM-WQMIS</b> </span>
+            </a>
+            <nav class="navbar navbar-static-top" role="navigation">
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                </a>
+
+
+            </nav>
+        </header>
+
+        <aside class="main-sidebar">
+            <section class="sidebar">
+
+                <div class="user-panel">
+                    <div class="pull-left image">
+                        <img src="/WQMIS/admin/img/jjm_new_logo.svg" class="img-circle" alt="User Image">
+                    </div>
+                    <div class="pull-left info">
+                                            </div>
+                </div>
+
+                <ul class="sidebar-menu" data-widget="tree">
+                    <li class="header">NAVIGATION MENU</li>
+                        <li class="active"><a href="/WQMIS/Main/Index" style="background: #0684d2; "><i class="fa fa-home"></i> <span>Home</span></a></li>
+                        <li class=""><a href="/WQMIS/Report/Index" style=" background: #024873; color: white;"><i class="fa fa-list"></i> <span>Report / Analytics</span></a></li>
+
+
+                </ul>
+            </section>
+        </aside>
+
+        <div class="content-wrapper">
+
+                <input type="hidden" class="hdnsession" value="Guest" />
+
+            
+
+
+<style>
+
+    .co-button {
+        float: right;
+        margin: 0px -30px;
+        height: 38px;
+    }
+
+    .txtnumber {
+        text-align: right;
+    }
+
+    .txtcontent {
+        text-align: left;
+    }
+
+    .textcontent_center {
+        text-align: center;
+    }
+
+    th {
+        vertical-align: middle !important;
+    }
+
+    .pewright {
+        float: right !important;
+    }
+
+    .SelectedParameter {
+        display: none;
+        font-weight: bold;
+        text-align: left;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <section class="content-header">
+            <div class="row">
+                <div class="col-sm-9">
+                    <h4>
+                        <span id="ReportHeading">Format L2. List of samples where samples with inconclusive testing results  </span> &nbsp;
+                        <a class="btn btn-primary" href="/WQMIS/Report/Labtestingdata?fy=ni369euDLLUKADXqJfCMlA==&stid=n4y3XImHOT34OR3rSpPhoQ==&dtid=n0aEfYhRFcsQq4GHwMv0ag==&blid=V4QrwEjQYoWNv1aollfiTQ==&gpid=r3WVlYFvPMYDHe3OpJbpOw==&viid=rVJO3lG/mOFqgnBQKfD4WA==" style="font-size: 9px;"> <i class="fa fa-backward"></i> Back</a>
+                    </h4>
+                </div>
+
+                <div class="col-sm-1">
+
+                </div>
+
+                <div class="col-sm-2">
+                    <div class="pewright">
+<form action="/WQMIS/Report/ExportToExcel" method="post">                            <input type="hidden" name="GridHtml" />
+                            <input type="hidden" name="FileName" />
+                            <button onclick="GetExcelContent()" style="border: none;">
+                                <i class="fa fa-file-excel-o w3-xlarge" style="color: green; padding-left: 20px;"></i>
+                            </button>
+</form>                    </div>
+                    <div class="pewright">
+                        <a href="#" onclick="printdiv();return false;">
+                            <img class="headrIcone" />
+                            <i class="fa fa-print w3-xlarge" style="color: #003b64; padding-left: 20px;"></i>
+                        </a>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+
+        <section class="content container-fluid paddinglist">
+            <div class="box box-primary">
+                <input type="hidden" name="hdnStateId" class="hdnStateId" value="15" />
+                <input name="__RequestVerificationToken" type="hidden" value="gfmJnUxxjVFfBOWiJ7yJzNcazqtPyc3hH-YZ7pETYJIothkammhnmcAw2mBiXgnZ2OCSZJSD_79fS6432HptnI6Bw8U1" />
+
+                <div class="row">
+                    <div class="col-sm-10" id="execel">
+                        <a href="/WQMIS/Report/ExportToExcellabtestingsample?p_type=wwzpNubYPerVdWDfhxKGrQ==&fy=ni369euDLLUKADXqJfCMlA==&stid=n4y3XImHOT34OR3rSpPhoQ==&dtid=n0aEfYhRFcsQq4GHwMv0ag==&blid=V4QrwEjQYoWNv1aollfiTQ==&gpid=r3WVlYFvPMYDHe3OpJbpOw==&&villid=rVJO3lG/mOFqgnBQKfD4WA==" style="font-size: 12px;">
+                            <i class="fa fa-file-excel-o w3-xlarge" style="color: blue; margin-top: 5px; margin-left: 11px;"></i>
+                        </a>
+                    </div>
+
+                    <div class="col-sm-2 w3-right" id="ddlpagination">
+                        <select class="form-control CurentPage" data-val="true" data-val-number="The field CurentPage must be a number." data-val-required="The CurentPage field is required." id="ddlPageNo" name="CurentPage" onchange="javascript:GetData(this.value);"><option selected="selected" value="1">Page No. 1</option>
+</select>
+                    </div>
+                </div>
+                <div class="table-responsive" id="printpage">
+                    <center style="display:none;" id="hdnheading">
+                        <span style="color: #2494d4;font-size: 19px;font-weight: 700;">Jal Jeevan Mission</span>
+                        <br /><font size=4>Water Quality Management Information System</font>
+                        <font size=3>
+                            <br>Department of Drinking Water & Sanitation, Ministry of Jal Shakti (GOI)
+                        </font>
+                        <br /><br />
+                        
+                    </center>
+
+                    <div class="box-body " id="printpage">
+                        <div class="SelectedParameter">
+                            <center>
+                                <b>Format L2. List of samples where samples with inconclusive testing results (2025-2026)</b>
+                            </center>
+                        </div>
+                        <br />
+
+                        <table class="table" style="font-size: 13px;">
+                            <thead>
+                                <tr style="text-align: center;">
+                                    <th style="width: 3%;">S.No.</th>
+                                    <th style="width: 7%;text-align: center;" class="headName">State  (2025-2026)</th>
+                                    <th style="width: 7%;text-align: center;" class="headName">District</th>
+                                    <th style="width: 7%;text-align: center;" class="headName">Block</th>
+                                    <th style="width: 7%;text-align: center;" class="headName">Gram panchayat</th>
+                                    <th style="width: 7%;text-align: center;" class="headName">Village</th>
+                                    <th style="width: 10%;text-align: center;" class="headName">Sample source</th>
+                                    <th style="width: 9%;text-align: center;" class="headName">Sample Id</th>
+                                    <th style="width: 9%;text-align: center;" class="headName">Lab name</th>
+                                    <th style="width: 9%;text-align: center;" class="headName">Sample Collection date</th>
+                                    <th style="width: 9%;text-align: center;" class="headName">Sample tested date</th>
+                                    <th style="width: 9%;text-align: center;" class="headName">Sample Status</th>
+                                    <th style="width: 11%;text-align: center;" class="headName">Contaminated parameters</th>
+
+                                        <th style="width: 11%;text-align: center;" class="headName">Chemical parameters</th>
+                                        <th style="width: 11%;text-align: center;" class="headName">Bacteriologial parameters</th>
+
+
+
+                                </tr>
+                            </thead>
+                            <tbody class="tbllabtestingsample">
+                                        <tr>
+                                            <td>1</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Adagal</td>
+                                            <td class="txtcontent">Adagal</td>
+                                            <td class="txtcontent">Individual house tap water   adagal</td>
+                                            <td class="txtcontent">U703822S34346478</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">12/12/2025</td>
+                                            <td class="txtcontent">--</td>
+
+                                            <td class="txtcontent"></td>
+                                            <td class="txtcontent"></td>
+
+                                                <td class="txtcontent"></td>
+                                                <td class="txtcontent"></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Adagal</td>
+                                            <td class="txtcontent">Adagal</td>
+                                            <td class="txtcontent">Anganwadi name : Adagalla Anganwadi 4</td>
+                                            <td class="txtcontent">U703822S34346558</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">27/01/2026</td>
+                                            <td class="txtcontent">--</td>
+
+                                            <td class="txtcontent"></td>
+                                            <td class="txtcontent"></td>
+
+                                                <td class="txtcontent"></td>
+                                                <td class="txtcontent"></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Adagal</td>
+                                            <td class="txtcontent">Adagal</td>
+                                            <td class="txtcontent">Anganwadi name : Adagalla Anganwadi 4</td>
+                                            <td class="txtcontent">U703822S34346720</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">27/01/2026</td>
+                                            <td class="txtcontent">--</td>
+
+                                            <td class="txtcontent"></td>
+                                            <td class="txtcontent"></td>
+
+                                                <td class="txtcontent"></td>
+                                                <td class="txtcontent"></td>
+
+                                        </tr>
+                            </tbody>
+                        </table>
+                        <table style="border:collapse collapse;display:none;width:100%" id="hdnfooter">
+                            <tr>
+                            <tr><td align=left class=ReportFooter><i>Source: https://ejalshakti.gov.in </i> </td><td align=right class=ReportFooter></td></tr>
+                            <tr><td>&nbsp;</td><td class=ReportFooter align=right>Report Printed On 10/23/2026 12:48:48 PM</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+</div>
+<script src="/WQMIS/Content/Print.js"></script>
+<script src="/WQMIS/Scripts/enc-base64-min.js"></script>
+<script src="/WQMIS/Scripts/aes.js"></script>
+<script>
+    $(document).ready(function () {
+         
+        if (1 == 1) {
+            $("#ddlpagination").hide();
+            $("#execel").hide();
+        }
+        else {
+            $("#ddlpagination").show();
+            $("#execel").show();
+        }
+     });
+
+
+
+    function GetData(_Id) {
+
+        var _st = 15;
+        var _dt = 187;
+        var _bl = 2481;
+        var _gp = 59783;
+        var _vil = 0;
+        var _fy = "2025-2026";
+        var _custa = "4";
+        var _cpage = _Id;
+        var url = "../Report/labtestingsamplelist_fil/";
+        var ulplan = "";
+        $(".tbllabtestingsample").html('');
+        $.ajax({
+            url: url,
+            data: {
+                cpage: enCriptedAES(_cpage),
+                currentstatus: enCriptedAES(_custa),
+                stid: enCriptedAES(_st),
+                dtid: enCriptedAES(_dt),
+                blid: enCriptedAES(_bl),
+                gpid: enCriptedAES(_gp),
+                villid: enCriptedAES(_vil),
+                fy: enCriptedAES(_fy)
+            },
+            cache: false,
+            type: "POST",
+            success: function (data) {
+
+                if (data.Labtestingdata.length > 0) {
+                    for (var x = 0; x < data.Labtestingdata.length; x++) {
+                        ulplan += "<tr>";
+                        ulplan += "<td>" + data.Labtestingdata[x].RowNo + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].State + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].District + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].Block + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].Grampanchayat + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].Village + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].sample_sourceName + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].SampleId + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].labname + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].sample_collection_time + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].s_report_approval_action_time + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].Status + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].Contaminated_parameters + "</td>";
+
+                        if (data.currentstatus == '14') {
+                            ulplan += "<td>" + data.Labtestingdata[x].chemical_parameter + "</td>";
+                        } else if (data.currentstatus == '15') {
+                            ulplan += "<td>" + data.Labtestingdata[x].bact_parameter + "</td>";
+                        }
+                        else {
+                            ulplan += "<td>" + data.Labtestingdata[x].chemical_parameter + "</td>";
+                            ulplan += "<td>" + data.Labtestingdata[x].bact_parameter + "</td>";
+                        }
+
+
+                        /* ulplan += "<td>" + data.Labtestingdata[x].s_report_approval_action_time + "</td>";*/
+                        
+                        if (data.currentstatus == '11') {
+                            ulplan += "<td>" + data.Labtestingdata[x].Remedial_chem_remarks + "</td>";
+                            ulplan += "<td>" + data.Labtestingdata[x].Remedial_bact_remarks + "</td>";
+                        } else if (data.currentstatus == '12') {
+                            ulplan += "<td>" + data.Labtestingdata[x].Remedial_chem_remarks + "</td>";
+                            ulplan += "<td>" + data.Labtestingdata[x].Remedial_bact_remarks + "</td>";
+                        } else if (data.currentstatus == '13') {
+                            ulplan += "<td>" + data.Labtestingdata[x].Remedial_chem_remarks + "</td>";
+                            ulplan += "<td>" + data.Labtestingdata[x].Remedial_bact_remarks + "</td>";
+                        }
+
+                        ulplan += "</tr>"
+                    }
+                }
+                else {
+                    ulplan += "<tr><td colspan='8' style='text-align: right;color: red'>No records available</td></tr>";
+                }
+                $(".tbllabtestingsample").append(ulplan);
+                
+                if (data.TotalPage > 1) {
+                    $("#ddlpagination").show();
+                    GetddlPag(data.TotalPage, data.CurentPage);
+                }
+                else {
+                    $("#ddlpagination").hide();
+                }
+            },
+        });
+    }
+
+    function GetddlPag(_TotalPage, CurentPage) {
+        
+        var url = "../Report/GetddlPaging/";
+        $.ajax({
+            url: url,
+            data: { TotPage: _TotalPage },
+            cache: false,
+            type: "POST",
+            async: false,
+            success: function (data) {
+                if (data.length > 0) {
+                    var markup = '';
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].PageNo + ">" + data[x].PageNotitle + "</option>";
+                    }
+                    $("#ddlPageNo").html(markup).show();
+                    $(".CurentPage").val(CurentPage);
+                }
+                else {
+                    $("#ddlPageNo").empty();
+                }
+            },
+
+        });
+    }
+
+
+
+</script>
+            
+        </div>
+
+        <footer class="main-footer">
+            <h4 id="spndatetime" class="spndatetime" hidden="hidden" style="text-align:right;">10/23/2026 12:48:48 PM</h4>
+            <div class="pull-right hidden-xs">
+                You will be logged out for inactivity.
+            </div>
+            <strong>Designed & developed by  <a href="#">NIC </a>.</strong> Copyright © NJJM 2020
+        </footer>
+        <div class="control-sidebar-bg"></div>
+
+    </div>
+
+</body>
+
+</html>

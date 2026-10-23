@@ -1,0 +1,8 @@
+node_modules/
+web/dist/
+data/raw/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store

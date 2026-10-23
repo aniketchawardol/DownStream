@@ -1,0 +1,23 @@
+# Runs services/worker/jobs/wqmis-samples.js once. Job logic is shared with the local Docker worker.
+name: wqmis sample lists
+on:
+  schedule: [{ cron: '30 20 * * *' }]   # daily 02:00 IST (cron is UTC)
+  workflow_dispatch: {}
+concurrency: { group: wqmis, cancel-in-progress: false }
+permissions: { contents: read }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci --omit=dev
+      - run: node services/worker/run-once.js wqmis-samples
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
+          WQMIS_STATES: ${{ secrets.WQMIS_STATES }}
+          WQMIS_DISTRICTS: ${{ secrets.WQMIS_DISTRICTS }}

@@ -1,0 +1,71 @@
+/* Palette from Survey of India toposheet inks and field-test-kit reagents. Rationale in docs/DESIGN.md. */
+:root {
+  --limestone: #E7ECEA;
+  --basalt: #222A2D;
+
+  --page: var(--limestone);
+  --ink: var(--basalt);
+  --ink-soft: #4A5458;
+  --rule: #BFC9C5;
+  --rule-soft: #D3DBD8;
+  --raised: #F1F4F3;          /* the one lighter plane: inputs and the bottom sheet */
+  --survey: #1E5E8A;          /* rivers, CPCB layer, links, focus */
+  --survey-wash: rgba(30, 94, 138, 0.10);
+  --umber: #6F5B3E;           /* WQMIS / groundwater layer */
+  --ok: #2E7A57;              /* fills */
+  --ok-ink: #256848;          /* text (AA on limestone) */
+  --caution: #D4A017;
+  --caution-ink: #7A5A00;
+  --danger: #B1271C;
+  --danger-ink: #B1271C;
+  --stale: rgba(34, 42, 45, 0.30);
+  --hatch-line: rgba(34, 42, 45, 0.55);
+  --on-survey: #FFFFFF;
+  --sim: #D4A017;
+  --sim-ink: #2B2200;
+  --shadow-sheet: 0 -6px 24px rgba(20, 28, 30, 0.18);
+
+  --font-ui: 'Anek Latin Variable', 'Anek Latin', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Source Serif 4 Variable', 'Source Serif 4', Georgia, 'Times New Roman', serif;
+
+  /* Type scale (px): 12, 14, 16, 18, 21, 24, 36, 48, 60 */
+  --t12: 0.75rem; --t14: 0.875rem; --t16: 1rem; --t18: 1.125rem; --t21: 1.3125rem;
+  --t24: 1.5rem; --t36: 2.25rem; --t48: 3rem; --t60: 3.75rem;
+
+  --r-data: 2px;
+  --r-pill: 999px;
+  --panel-w: 420px;
+  --gutter: 24px;
+  --band-h: 0px;
+  --sim-h: 38px;
+}
+/* Simulation mode is known at first paint (the server adds .sim), so the band's height is reserved up front. */
+:root.sim { --band-h: var(--sim-h); }
+@media (max-width: 899px) { :root { --sim-h: 56px; } }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Night survey */
+    --page: #182022;
+    --ink: #DCE3E0;
+    --ink-soft: #A9B4B0;
+    --rule: #3A4846;
+    --rule-soft: #2A3536;
+    --raised: #1E282A;
+    --survey: #7DB3D9;
+    --survey-wash: rgba(125, 179, 217, 0.12);
+    --umber: #B59A72;
+    --ok: #4FAF80;
+    --ok-ink: #6FCB9C;
+    --caution: #E2B23A;
+    --caution-ink: #E8C25A;
+    --danger: #E2675B;
+    --danger-ink: #F08A7F;
+    --stale: rgba(220, 227, 224, 0.28);
+    --hatch-line: rgba(220, 227, 224, 0.5);
+    --on-survey: #182022;
+    --sim: #C99A1C;
+    --sim-ink: #1A1500;
+    --shadow-sheet: 0 -6px 24px rgba(0, 0, 0, 0.45);
+  }
+}

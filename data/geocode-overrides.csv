@@ -1,0 +1,2 @@
+# Manual geocode overrides: one row per area. level is gp, block, district or village; jjm_id from WQMIS.
+level,jjm_id,lat,lng,note

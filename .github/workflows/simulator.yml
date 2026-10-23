@@ -1,0 +1,24 @@
+# Runs services/worker/jobs/simulator.js once. Job logic is shared with the local Docker worker.
+name: simulator
+on:
+  schedule: [{ cron: '2-59/5 * * * *' }]   # every 5 minutes, 2 minutes after the mailer; each run fires ~50% of the time (cron is UTC)
+  workflow_dispatch: {}
+concurrency: { group: simulator, cancel-in-progress: false }
+permissions: { contents: read }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci --omit=dev
+      - run: node services/worker/run-once.js simulator
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          MOCK_MODE: ${{ secrets.MOCK_MODE || 'true' }}
+          MOCK_EMAIL: ${{ secrets.MOCK_EMAIL }}
+          MOCK_LAT: ${{ secrets.MOCK_LAT }}
+          MOCK_LNG: ${{ secrets.MOCK_LNG }}

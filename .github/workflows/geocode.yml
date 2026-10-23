@@ -1,0 +1,22 @@
+# Runs services/worker/jobs/geocode.js once. Job logic is shared with the local Docker worker.
+name: geocode panchayats
+on:
+  schedule: [{ cron: '30 21 * * 6' }]   # Sunday 03:00 IST, after the hierarchy crawl (cron is UTC)
+  workflow_dispatch: {}
+concurrency: { group: geocode, cancel-in-progress: false }
+permissions: { contents: read }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci --omit=dev
+      - run: node services/worker/run-once.js geocode
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
+          WQMIS_DISTRICTS: ${{ secrets.WQMIS_DISTRICTS }}

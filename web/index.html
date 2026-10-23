@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>DownStream: what India's water data says about a place, and how old it is</title>
+    <meta name="description" content="River readings from CPCB's real-time stations and tap-water lab tests from the Jal Jeevan Mission, on one map, with the age of every number shown." />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#E7ECEA" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#182022" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip" href="#places">Skip to the list of places</a>
+    <div class="sim-band" id="sim-band" role="status" hidden>Simulation mode is on. Alerts marked as simulated are invented for testing.</div>
+    <div class="notice-band" id="notice-band" role="status" hidden></div>
+
+    <div class="layout" id="layout">
+      <div class="map-wrap" id="map-wrap">
+        <div id="map" class="map" role="region" aria-label="Map of river stations and tested panchayats. Use the list of places for keyboard access."></div>
+        <div class="map-fallback" id="map-fallback">The map is loading. Everything on it is also in the list of places.</div>
+        <figure class="legend" id="legend" aria-label="Map key">
+          <figcaption><button type="button" class="legend-btn" id="legend-btn" aria-expanded="true" aria-controls="legend-items">Map key</button></figcaption>
+          <ul id="legend-items">
+            <li><svg viewBox="0 0 28 28" width="22" height="22" aria-hidden="true"><circle cx="14" cy="14" r="11" class="lg-ring-river" /><circle cx="14" cy="14" r="6.5" class="lg-fill-ok" /></svg>River station (CPCB)</li>
+            <li><svg viewBox="0 0 28 28" width="22" height="22" aria-hidden="true"><rect x="3" y="3" width="22" height="22" rx="6" class="lg-ring-tap" /><rect x="8.5" y="8.5" width="11" height="11" rx="2" class="lg-fill-ok" /></svg>Tested panchayat (JJM lab)</li>
+            <li><svg viewBox="0 0 28 28" width="22" height="22" aria-hidden="true"><circle cx="14" cy="14" r="11" class="lg-ring-river" pathLength="100" stroke-dasharray="35 65" /><circle cx="14" cy="14" r="6.5" class="lg-fill-ok" /></svg>Ring length: how fresh the data is</li>
+            <li><svg viewBox="0 0 28 28" width="22" height="22" aria-hidden="true"><circle cx="14" cy="14" r="11" class="lg-ring-stale" /><circle cx="14" cy="14" r="6.5" fill="url(#hatch)" class="lg-fill-stale" /></svg>Dotted: no recent data</li>
+          </ul>
+          <ul class="legend-status">
+            <li><span class="swatch ok"></span>Within limits</li>
+            <li><span class="swatch caution"></span>Above acceptable</li>
+            <li><span class="swatch danger"></span>Above permissible or outside river limit</li>
+          </ul>
+        </figure>
+      </div>
+
+      <div class="sheet" id="sheet">
+        <button class="sheet-handle" id="sheet-handle" type="button" aria-controls="sheet" aria-label="Resize the panel"><span></span></button>
+        <div class="sheet-scroll" id="sheet-scroll">
+        <aside class="panel" id="panel">
+          <header class="masthead">
+            <p class="wordmark"><a href="/">DownStream</a></p>
+            <a class="freshness" id="freshness" href="#ledger">Checking sources</a>
+          </header>
+
+          <section class="hero" aria-labelledby="hero-sentence">
+            <h1 id="hero-sentence" class="hero-sentence">What does India's government water data say near you, and how old is it?</h1>
+            <p class="hero-note" id="hero-note">River readings come from CPCB's real-time stations. Tap-water results come from Jal Jeevan Mission laboratory tests.</p>
+            <div class="hero-actions">
+              <button type="button" class="btn btn-primary" id="btn-locate">Use my location</button>
+              <button type="button" class="btn" id="btn-alerts">Get alerts</button>
+            </div>
+            <form class="place-search" id="place-search" role="search" hidden>
+              <label for="place-q">Search for a district, block, panchayat, town or PIN code</label>
+              <div class="place-search-row">
+                <input id="place-q" name="q" type="search" autocomplete="off" minlength="2" maxlength="80" required placeholder="For example Badami or 587201" />
+                <button type="submit" class="btn">Search</button>
+              </div>
+              <p class="hint">Or click anywhere on the map to drop a pin.</p>
+              <ul class="search-results" id="search-results" aria-live="polite"></ul>
+            </form>
+            <p class="status-line" id="locate-status" role="status"></p>
+          </section>
+
+          <section class="nearby" id="nearby" aria-labelledby="nearby-h" hidden>
+            <h2 id="nearby-h">Near your pin</h2>
+            <div id="nearby-body"></div>
+          </section>
+
+          <section class="selected" id="selected" aria-live="polite" tabindex="-1"></section>
+
+          <section class="subscribe" id="subscribe" aria-labelledby="subscribe-h">
+            <h2 id="subscribe-h">Get email alerts</h2>
+            <form id="subscribe-form" novalidate>
+              <p class="pin-line" id="pin-line">Click the map or use your location to drop a pin.</p>
+              <p class="testpoint" id="testpoint" hidden><button type="button" class="btn-text" id="btn-testpoint">Use the simulation test point</button> to receive simulated alerts, invented every few minutes for testing.</p>
+              <div class="field">
+                <label for="radius">Alert radius: <output id="radius-out" for="radius">10 km</output></label>
+                <input type="range" id="radius" name="radius" min="1" max="50" step="1" value="10" />
+              </div>
+              <div class="field">
+                <label for="email">Email address</label>
+                <input type="email" id="email" name="email" autocomplete="email" required maxlength="254" />
+              </div>
+              <fieldset class="field">
+                <legend>Email me when</legend>
+                <label class="check"><input type="checkbox" name="kinds" value="river" checked /> A river reading crosses a safe limit</label>
+                <label class="check"><input type="checkbox" name="kinds" value="tap" checked /> A new tap-water test fails</label>
+                <label class="check"><input type="checkbox" name="kinds" value="overdue" /> An area near me is overdue for testing</label>
+                <label class="check"><input type="checkbox" name="kinds" value="digest" checked /> A weekly summary</label>
+              </fieldset>
+              <button type="submit" class="btn btn-primary" id="subscribe-submit">Send confirmation email</button>
+              <p class="form-status" id="subscribe-status" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <section class="alerts-recent" id="alerts-recent" aria-labelledby="alerts-h" hidden>
+            <h2 id="alerts-h">Recent alerts</h2>
+            <ol id="alerts-list"></ol>
+          </section>
+
+          <section class="places" id="places" aria-labelledby="places-h">
+            <h2 id="places-h">Places on the map</h2>
+            <p class="hint">Every marker on the map, as a list. Choose one to read its data.</p>
+            <div id="places-body"><p class="hint">Loading places.</p></div>
+          </section>
+        </aside>
+        </div>
+      </div>
+    </div>
+
+    <div class="below" id="below">
+          <section class="journey" id="journey" aria-labelledby="journey-h">
+            <h2 id="journey-h">How a tap sample becomes public</h2>
+            <p class="lede">A lab result reaches this site through a chain of people and systems. Each step takes time, and the gaps are part of the story. The times below are medians from lab reports this site has read.</p>
+            <ol class="steps" id="steps">
+              <li data-step="collected"><h3>Collected</h3><p>A field worker or lab staff member fills a bottle at a tap, handpump or tubewell and logs it in WQMIS.</p><p class="lag" data-lag="collected_to_received"></p></li>
+              <li data-step="received"><h3>Reached the lab</h3><p>The sample arrives at a district or block water-testing laboratory.</p><p class="lag" data-lag="received_to_analysed"></p></li>
+              <li data-step="analysed"><h3>Analysed</h3><p>The lab measures chemical and physical parameters and, for some samples, bacteria.</p><p class="lag" data-lag="analysed_to_reported"></p></li>
+              <li data-step="reported"><h3>Report generated</h3><p>The lab approves the result and WQMIS generates a printable report.</p><p class="lag" data-lag="reported_to_first_seen"></p></li>
+              <li data-step="seen"><h3>First seen here</h3><p>This site checks every panchayat in scope once a day and records the day it first saw each result.</p><p class="lag" data-lag="collected_to_first_seen"></p></li>
+            </ol>
+            <p class="national" id="national"></p>
+          </section>
+
+          <section class="method" id="method" aria-labelledby="method-h">
+            <h2 id="method-h">Sources and method</h2>
+            <div class="prose">
+              <h3>River water: CPCB real-time stations</h3>
+              <p>The Central Pollution Control Board runs 40 automatic stations in the Ganga basin. Each reports roughly every hour. This site checks every 15 minutes and keeps every new reading, so it holds a history the source file does not. This is river water at the station, not the water in anyone's tap.</p>
+              <p>River readings are judged against CPCB's primary criteria for designated best use, <span id="criteria-label">Class C (drinking-water source after conventional treatment)</span>: pH, dissolved oxygen and biochemical oxygen demand. The stations' BOD is a sensor estimate, not a five-day laboratory BOD. Other parameters have no official river limit, so the site only flags unusual rises against the station's own past week.</p>
+              <h3>Tap water: Jal Jeevan Mission laboratory tests</h3>
+              <p>The Water Quality Management Information System publishes laboratory results for rural drinking-water sources, down to the village. Each source is tested once or twice a year at best. Results are judged against the limits printed on each lab report, which follow BIS IS 10500:2012. Where a report has not been read yet, the limits printed on other WQMIS reports, or the standard itself, are used and labelled as such.</p>
+              <p>Jal Jeevan Mission norms call for at least one chemical and physical test per source each year, and at least two bacteriological tests. A panchayat with no chemical test in 12 months, or no bacteriological test in 6, is shown as overdue.</p>
+              <h3>Locations</h3>
+              <p>WQMIS does not publish coordinates for panchayats. This site looks them up in OpenStreetMap and stores a confidence score with each one. Panchayats it could not place are drawn at their block's position and marked as approximate.</p>
+              <h3>What this site does not do</h3>
+              <p>It does not say whether water is safe to drink. It makes no claim about water between official tests, makes no predictions, and uses no sensors of its own. Bacteria found in one panchayat's sample are never shown as affecting its neighbours.</p>
+            </div>
+          </section>
+
+          <section class="ledger" id="ledger" aria-labelledby="ledger-h">
+            <h2 id="ledger-h">Freshness ledger</h2>
+            <p class="lede">When each source was last read, how new its newest data point is, and how many records the last run added.</p>
+            <div class="table-wrap"><table id="ledger-table"><caption class="sr-only">Source freshness</caption>
+              <thead><tr><th scope="col">Source</th><th scope="col">Last successful fetch</th><th scope="col">Newest data point</th><th scope="col">Records in last run</th><th scope="col">State</th></tr></thead>
+              <tbody><tr><td colspan="5">Loading.</td></tr></tbody>
+            </table></div>
+          </section>
+
+          <footer class="site-footer">
+            <p>Data: Central Pollution Control Board (rtwqmsdb1.cpcb.gov.in); Ministry of Jal Shakti, Jal Jeevan Mission WQMIS (ejalshakti.gov.in). Map data &copy; OpenStreetMap contributors, tiles by OpenFreeMap.</p>
+            <p>DownStream is an independent public-interest project and is not affiliated with the Government of India.</p>
+          </footer>
+    </div>
+
+    <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+      <defs>
+        <pattern id="hatch" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
+          <rect width="4" height="4" class="hatch-bg" />
+          <line x1="0" y1="0" x2="0" y2="4" class="hatch-line" />
+        </pattern>
+      </defs>
+    </svg>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

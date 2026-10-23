@@ -1,0 +1,19 @@
+# Keeps the free Render web service from sleeping (it spins down after 15 idle minutes).
+# Every 10 minutes leaves slack for GitHub's scheduler running late.
+name: keep render web awake
+on:
+  schedule: [{ cron: '*/10 * * * *' }]
+  workflow_dispatch: {}
+concurrency: { group: keepalive, cancel-in-progress: true }
+permissions: {}
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      # --max-time 90: if it did fall asleep, the first request waits out the cold start instead of failing.
+      - run: |
+          curl -fsS --retry 2 --max-time 90 -o /dev/null -w '%{http_code} in %{time_total}s\n' \
+            "${PUBLIC_BASE_URL:-https://downstream-web.onrender.com}/api/health"
+        env:
+          PUBLIC_BASE_URL: ${{ secrets.PUBLIC_BASE_URL }}

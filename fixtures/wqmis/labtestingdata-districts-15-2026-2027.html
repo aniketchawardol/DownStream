@@ -1,0 +1,3534 @@
+
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>JJM-WQMIS</title>
+    <link rel="shortcut icon" href="/WQMIS/Image/favicon.ico">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <link rel="stylesheet" href="/WQMIS/admin/css/bootstrap.min.css">
+    <link href="/WQMIS/admin/css/font-awesome.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="/WQMIS/admin/css/all-skins.min.css">
+    <link href="/WQMIS/admin/css/AdminLTE.min.css" rel="stylesheet" />
+    <script src="/WQMIS/Scripts/jquery.min.js"></script>
+        <script src="/WQMIS/admin/Js/bootstrap.min.js"></script>
+
+    <script src="/WQMIS/admin/Js/adminlte.min.js"></script>
+    <link href="/WQMIS/admin/css/w3.css" rel="stylesheet" />
+    <script src="/WQMIS/admin/Js/SHA512.js"></script>
+    <link href="/WQMIS/admin/Datatable/jquery.dataTables.min.css" rel="stylesheet" />
+
+    <script src="/WQMIS/Scripts/frmValidate.js"></script>
+
+
+    <link href="/WQMIS/Content/datatable/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="/WQMIS/admin/Datatable/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="/WQMIS/admin/Datatable/jquery.dataTables.min.js"></script>
+    <link href="/WQMIS/admin/Datatable/buttons.dataTables.min.css" rel="stylesheet" />
+    <script src="/WQMIS/admin/Datatable/dataTables.buttons.min.js"></script>
+
+
+    
+    <script src="/WQMIS/Content/datatable/dataTables.buttons.js"></script>
+    <script src="/WQMIS/Content/datatable/buttons.html5.js"></script>
+    <script src="/WQMIS/Content/datatable/buttons.print.js"></script>
+    
+
+
+    <script src="/WQMIS/admin/Datatable/jszip.min.js"></script>
+    <script src="/WQMIS/admin/Datatable/pdfmake.min.js"></script>
+    <script src="/WQMIS/admin/Datatable/vfs_fonts.js"></script>
+    <script src="/WQMIS/Scripts/globalFinYear.js"></script>
+
+    <link href="/WQMIS/Content/grid.css" rel="stylesheet" />
+    <style>
+
+        li.treeview.menu-open a {
+            border-left-color: #43daff !important;
+        }
+
+
+
+        .skin-blue .sidebar-menu > li:hover > a, .skin-blue .sidebar-menu > li.active > a, .skin-blue .sidebar-menu > li.menu-open > a {
+            border-left-color: #43daff !important;
+        }
+
+
+        .treeview.menu-open > .treeview-menu {
+            display: block;
+        }
+    </style>
+
+    <script src="/WQMIS/Content/kendo.all.min.js"></script>
+    <script src="/WQMIS/Content/Print.js"></script>
+
+    <script type="text/javascript">
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+    </script>
+
+    <script>
+        jQuery(function ($) {
+            //var path = window.location.href;
+            var path = window.location.href.replace(/#/g, '');
+            // because the 'href' property of the DOM element is the absolute path
+            $('ul a').each(function () {
+                if (this.href === path) {
+                    $(this).addClass('active_menu-open');
+                }
+            });
+        });
+        $(document).ready(function () {
+            $(".active_menu-open").parentsUntil("treeview").addClass("menu-open");
+            //let tk = sessionStorage.getItem("GGTRYU-e664a07a-9c5d-49ba-98ed-fabe9c6f58bb");
+            //$.ajax({
+            //    type: "GET",
+            //    asnc: false,
+            //    url: '/Home/chtk',
+            //      headers: { "tk": tk },
+            // /*   data: {tk:tk},*/
+            //    success: function (data) {
+            //        debugger;
+            //        if (!data) {
+            //            alert();
+            //            var url = "../Error/Error";
+            //            window.location.href = $(location).attr('host') + '/Error/Error';
+            //            sessionStorage.clear();
+            //        }
+            //    },
+            //    error: function () {
+            //        var url = "../Error/Error";
+            //        window.location.href = url;
+            //        sessionStorage.clear();
+            //    }
+
+            //});
+
+
+
+            function ajaxindicatorstart(text) {
+                if ($('body').find('#resultLoading').attr('id') != 'resultLoading') {
+                    $('body').append('<div id="resultLoading" style="display:none"><div><div id="cssload-loader"><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div></div><div>' + text + '</div></div><div class="bg"></div></div>');
+                }
+                $('#resultLoading').css({
+                    'width': '100%',
+                    'height': '100%',
+                    'position': 'fixed',
+                    'z-index': '10000000',
+                    'top': '0',
+                    'left': '0',
+                    'right': '0',
+                    'bottom': '0',
+                    'margin': 'auto'
+                });
+                $('#resultLoading .bg').css({
+                    'background': '#000000',
+                    'opacity': '0.7',
+                    'width': '100%',
+                    'height': '100%',
+                    'position': 'absolute',
+                    'top': '0'
+                });
+                $('#resultLoading>div:first').css({
+                    'width': '250px',
+                    'height': '75px',
+                    'text-align': 'center',
+                    'position': 'fixed',
+                    'top': '0',
+                    'left': '0',
+                    'right': '0',
+                    'bottom': '0',
+                    'margin': 'auto',
+                    'font-size': '16px',
+                    'z-index': '10',
+                    'color': '#ffffff'
+
+                });
+                $('#resultLoading .bg').height('100%');
+                $('#resultLoading').fadeIn(300);
+                $('body').css('cursor', 'wait');
+            }
+            function ajaxindicatorstop() {
+                $('#resultLoading .bg').height('100%');
+                $('#resultLoading').fadeOut(300);
+                $('body').css('cursor', 'default');
+            }
+            $(document).ajaxStart(function () {
+                var hideajax = 0;
+                hideajax = document.getElementById("txthideajax");
+                if (hideajax == null) {
+                    ajaxindicatorstart('Processing.. please wait..');
+                }
+            }).ajaxStop(function () {
+                ajaxindicatorstop();
+            });
+            //$(document).ajaxError(function () {
+            //    let url = "../Error/Error";
+            //    window.open(url, "_self");
+            //});
+           if(13 == 7 || 13 == 4)
+                Getlanguage();
+            if(13 == 10)
+                Getlanguage();
+
+
+
+               if ('' == 'False' && 13 == 2)
+                      $(".sidebar-menu").css("display", "none");
+             else
+                       $(".sidebar-menu").css("display", "block");
+
+            $("#ddllanguage").change(function () {
+
+                let lang = $("#ddllanguage option:selected").val();
+                var url1 = window.location.href;
+                let url = "../Common/ChangeLanguage?lang=" + lang + "&url=" + url1 + " ";
+                localStorage.setItem("lang", lang);
+                setCookie('lang', lang)
+                window.open(url, "_self");
+            });
+
+
+
+
+        });
+
+
+        function setCookie(key, value, days) {
+            var expires = new Date();
+            expires.setTime(expires.getTime() + 31536000000); //1 year
+            document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+        }
+
+        function Getlanguage() {
+            var url = "../Common/Getlanguage/";
+            $.ajax({
+                url: url,
+
+                cache: false,
+                type: "POST",
+                async: false,
+                success: function (data) {
+
+                    if (data.length > 0) {
+                        var markup = '';
+                        for (var x = 0; x < data.length; x++) {
+                            markup += "<option value=" + data[x].LanguageCultureName + ">" + data[x].LanguageFullName + "</option>";
+
+                        }
+                        $("#ddllanguage").html(markup).show();
+
+                    }
+                    else {
+                        $("#ddllanguage").empty();
+
+                    }
+
+                },
+
+            });
+            ;
+            let lg = localStorage.getItem("lang");
+            $("#ddllanguage").val(lg);
+        }
+
+    </script>
+
+    <script>
+        //function GetExcelContent() {
+
+        //    $("input[name='GridHtml']").val($("#printpage").html());
+
+        //    $("input[name='FileName']").val($("#ReportHeading").html());
+        //}
+        function GetExcelContent() {
+            if ($('#printpage .post_m').is(":hidden") == true) {
+                $("#hdnhtml").html($("#printpage").html());
+                $("#hdnhtml").css("display", "block");
+                $("#hdnhtml").find('.post_m').remove();
+                $("input[name='GridHtml']").val($("#hdnhtml").html());
+                $("#hdnhtml").html('');
+                $("#hdnhtml").css("display", "none");
+            }
+            else {
+                $("input[name='GridHtml']").val($("#printpage").html());
+            }
+            /* $("input[name='GridHtml']").val($("#hdnhtml").html());*/
+            $("input[name='FileName']").val($("#ReportHeading").html());
+        }
+
+        function GetExcelContent1() {
+            if ($('#printpage1 .post_m').is(":hidden") == true) {
+                $("#hdnhtml1").html($("#printpage1").html());
+                $("#hdnhtml1").css("display", "block");
+                $("#hdnhtml1").find('.post_m').remove();
+                $("input[name='GridHtml1']").val($("#hdnhtml1").html());
+                $("#hdnhtml1").html('');
+                $("#hdnhtml1").css("display", "none");
+            }
+            else {
+                $("input[name='GridHtml1']").val($("#printpage1").html());
+            }
+            /* $("input[name='GridHtml']").val($("#hdnhtml").html());*/
+            $("input[name='FileName1']").val($("#ReportHeading1").html());
+        }
+
+
+        function ExporttablePdf2() {
+
+            $("#hdnheading").show();
+            $("#hdnfooter").show();
+            // $(".grid-footer").hide();
+            var printDate = $("#spndatetime").html();
+            $("#printDate").text('Printed on : ' + printDate);
+
+
+            var FileName = $("#ReportHeading").html();
+
+            kendo.drawing.drawDOM("#printpage",
+                {
+                    paperSize: "A4",
+                    //landscape: true,
+                    margin: { left: ".5cm", top: ".1cm", right: ".5cm", bottom: ".1cm" },
+                    scale: 0.5,
+                    height: 500,
+                    repeatHeaders: true
+                })
+                .then(function (group) {
+                    $("#hdnheading").hide();
+                    $("#hdnfooter").hide();
+                    $("#printpage a").addClass("href").css("cursor", "pointer");
+                    return kendo.drawing.exportPDF(group, {
+                        paperSize: "a4",
+                        margin: { left: ".5cm", top: ".1cm", right: ".5cm", bottom: ".1cm" },
+                    }).done(function (data) {
+                        kendo.saveAs({
+                            dataURI: data,
+                            fileName: FileName + ".pdf"
+                        });
+                    });
+                });
+        }
+    </script>
+
+
+    <style>
+        .wqmis_menu .active a {
+            border-left-color: #3c8dbc;
+        }
+
+
+        li.menu-open > a {
+            border-left-color: #00c0ef !important;
+        }
+
+        ::selection {
+            color: #fff;
+            background: #2d8efe;
+            /* font-size: 14px;*/
+        }
+
+        ::-moz-selection {
+            color: #fff;
+            background: #2d8efe;
+            /*font-size: 14px;*/
+        }
+    </style>
+
+</head>
+
+<body class="hold-transition skin-blue sidebar-mini">
+
+
+    <div class="wrapper">
+        <div id="hdnhtml" style="display:none;"></div>
+        <header class="main-header">
+            <a href="#" class="logo">
+                <span class="logo-mini"></span>
+                <span class="logo-lg"><b>JJM-WQMIS</b> </span>
+            </a>
+            <nav class="navbar navbar-static-top" role="navigation">
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                </a>
+
+
+            </nav>
+        </header>
+
+        <aside class="main-sidebar">
+            <section class="sidebar">
+
+                <div class="user-panel">
+                    <div class="pull-left image">
+                        <img src="/WQMIS/admin/img/jjm_new_logo.svg" class="img-circle" alt="User Image">
+                    </div>
+                    <div class="pull-left info">
+                                            </div>
+                </div>
+
+                <ul class="sidebar-menu" data-widget="tree">
+                    <li class="header">NAVIGATION MENU</li>
+                        <li class="active"><a href="/WQMIS/Main/Index" style="background: #0684d2; "><i class="fa fa-home"></i> <span>Home</span></a></li>
+                        <li class=""><a href="/WQMIS/Report/Index" style=" background: #024873; color: white;"><i class="fa fa-list"></i> <span>Report / Analytics</span></a></li>
+
+
+                </ul>
+            </section>
+        </aside>
+
+        <div class="content-wrapper">
+
+                <input type="hidden" class="hdnsession" value="Guest" />
+
+            
+
+
+<style>
+    #disrclocation {
+        background: #eee;
+        width: 97%;
+        margin-left: 25px;
+        padding: 1px 8px;
+    }
+
+        #disrclocation .form-group.active {
+            background: #3c8dbc;
+            color: #fff;
+        }
+
+        #disrclocation .form-group {
+            margin: 0px;
+            padding: 5px 12px;
+        }
+
+    .co-button {
+        float: right;
+        margin: 0px -30px;
+        height: 38px;
+    }
+
+    .txtnumber {
+        text-align: right;
+    }
+
+    .txtcontent {
+        text-align: left;
+    }
+
+    .a {
+        cursor: pointer;
+        color: #3c8dbc;
+    }
+
+    .textcontent_center {
+        text-align: center;
+    }
+
+    th {
+        vertical-align: middle !important;
+    }
+
+    .pewright {
+        float: right !important;
+    }
+
+    .SelectedParameter {
+        display: none;
+        font-weight: bold;
+        text-align: left;
+    }
+</style>
+<input name="__RequestVerificationToken" type="hidden" value="N8BqTL7jWiyPME4vaKTQlQekkACRXs5GCdz6eJ6aMsaQt2UEy74JYMKo5DamIcju3v1J8f6fF-8L47ZVYyqlJJGVwIc1" />
+<div class="row">
+    <div class="col-md-12">
+        <section class="content-header">
+            <div class="row">
+                <div class="col-sm-9">
+                    <h4>
+                        <span id="ReportHeading">Format L2. Lab testing data</span> &nbsp;
+                        
+                    </h4>
+                </div>
+
+                <div class="col-sm-1">
+
+                </div>
+                <div class="col-sm-2">
+                    <div class="pewright">
+<form action="/WQMIS/Report/ExportToExcel" method="post">                            <input type="hidden" name="GridHtml" />
+                            <input type="hidden" name="FileName" />
+                            <button onclick="GetExcelContent()" style="border: none;">
+                                <i class="fa fa-file-excel-o w3-xlarge" style="color: green; padding-left: 20px;"></i>
+                            </button>
+</form>                    </div>
+                    <div class="pewright">
+                        <a href="#" onclick="printdiv();return false;">
+                            <img class="headrIcone" />
+                            <i class="fa fa-print w3-xlarge" style="color: #003b64; padding-left: 20px;"></i>
+                        </a>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+        <section class="content container-fluid paddinglist">
+            <div class="box box-primary">
+                <input type="hidden" name="hdnStateId" class="hdnStateId" value="15" />
+                <input name="__RequestVerificationToken" type="hidden" value="6vQdTt9z_34avoN3OKJJPxVhNvPBUlH9ViHwX6ZcEQ9GBwNQI1iteV_PHAdQ6xilgvJ2DDF0EUDjS-2B9ghWKNo07sc1" />
+                <div class="box filter" style="border: 1px solid #d2d6de; box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;">
+                    <div class="box-body">
+
+                        <div class="col-md-12 ba" id="disrclocation" tabindex="1">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="radio" class="txtOtherSources_id" checked="checked" name="source_filter" onclick="GetSourceCategoryfilter(99)" value="99">
+                                    <span id="spn_99"> All</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="radio" class="txtOtherSources_id" name="source_filter" onclick="GetSourceCategoryfilter(2)" value="2">
+                                    <span id="spn_2">   Water Supply Scheme Source</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="radio" name="source_filter" class="source_filter" onclick="GetSourceCategoryfilter(3)" value="3">
+                                    <span id="spn_3">  Delivery Point</span>
+                                </div>
+                            </div>
+                            
+
+                        </div>
+                        <br /> <br />
+
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="lab_name">Financial Year</label><span style="color:#a94442;"><b> *</b></span>
+                                <div class="input-group">
+                                    <div class="input-group-addon"><i class="fa fa-calendar"></i></div>
+                                    <select name="FinancialYear" required class="form-control hdddlYear fy" data-start="2021-2022" id="ddlYear" onchange="javascript:Getyear(this.value);">
+                                        
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="lab_name">State</label><span style="color:#a94442;"><b> </b></span>
+                                <div class="input-group">
+                                    <div class="input-group-addon"><i class="fa fa-building"></i></div>
+                                    <i class="fa-solid fa-city"></i>
+                                    <select class="form-control state" data-val="true" data-val-number="The field StateId must be a number." data-val-required="The StateId field is required." id="ddlState" name="StateId" onchange="javascript:GetDistrict(this.value);"><option value=" ">--Select--</option>
+<option value="1">Andaman &amp; Nicobar Islands</option>
+<option value="2">Andhra Pradesh</option>
+<option value="3">Arunachal Pradesh</option>
+<option value="4">Assam</option>
+<option value="5">Bihar</option>
+<option value="6">Chandigarh</option>
+<option value="33">Chhattisgarh</option>
+<option value="7">Dadra &amp; Nagar Haveli And Daman &amp; Diu</option>
+<option value="9">Delhi</option>
+<option value="10">Goa</option>
+<option value="11">Gujarat</option>
+<option value="12">Haryana</option>
+<option value="13">Himachal Pradesh</option>
+<option value="14">Jammu &amp; Kashmir</option>
+<option value="34">Jharkhand</option>
+<option selected="selected" value="15">Karnataka</option>
+<option value="16">Kerala</option>
+<option value="37">Ladakh</option>
+<option value="19">Lakshadweep</option>
+<option value="17">Madhya Pradesh</option>
+<option value="18">Maharashtra</option>
+<option value="20">Manipur</option>
+<option value="21">Meghalaya</option>
+<option value="22">Mizoram</option>
+<option value="23">Nagaland</option>
+<option value="24">Odisha</option>
+<option value="25">Puducherry</option>
+<option value="26">Punjab</option>
+<option value="27">Rajasthan</option>
+<option value="28">Sikkim</option>
+<option value="29">Tamil Nadu</option>
+<option value="36">Telangana</option>
+<option value="30">Tripura</option>
+<option value="31">Uttar Pradesh</option>
+<option value="35">Uttarakhand</option>
+<option value="32">West Bengal</option>
+</select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="lab_name">District</label><span style="color:#a94442;"><b> </b></span>
+                                <div class="input-group">
+                                    <div class="input-group-addon"><i class="fa fa-building"></i></div>
+                                    <select class="form-control _District" data-val="true" data-val-number="The field DistrictId must be a number." data-val-required="The DistrictId field is required." id="ddlDistrict" name="DistrictId" onchange="javascript:GetBlock(this.value);"><option value=" ">--Select--</option>
+<option value="187">Bagalkote</option>
+<option value="190">Ballari</option>
+<option value="189">Belagavi</option>
+<option value="188">BENGALURU RURAL</option>
+<option value="194">Bengaluru Urban</option>
+<option value="191">Bidar</option>
+<option value="212">CHAMARAJANAGARA</option>
+<option value="612">Chikkaballapura</option>
+<option value="193">CHIKKAMAGALURU</option>
+<option value="213">Chitradurga</option>
+<option value="195">Dakshina Kannada</option>
+<option value="210">Davangere</option>
+<option value="196">Dharwad</option>
+<option value="208">Gadag</option>
+<option value="198">Hassan</option>
+<option value="209">Haveri</option>
+<option value="197">Kalaburagi</option>
+<option value="199">Kodagu</option>
+<option value="200">Kolar</option>
+<option value="207">Koppal</option>
+<option value="201">Mandya</option>
+<option value="202">Mysuru</option>
+<option value="203">Raichur</option>
+<option value="613">RAMANAGARA</option>
+<option value="204">Shivamogga</option>
+<option value="205">TUMAKURU</option>
+<option value="211">Udupi</option>
+<option value="206">Uttara Kannada</option>
+<option value="822">Vijayanagar</option>
+<option value="192">VIJAYAPURA</option>
+<option value="690">Yadgir</option>
+</select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="lab_name">Block</label><span style="color:#a94442;"><b> </b></span>
+                                <div class="input-group">
+                                    <div class="input-group-addon"><i class="fa fa-building"></i></div>
+                                    <select class="form-control _Block" data-val="true" data-val-number="The field BlockId must be a number." data-val-required="The BlockId field is required." id="ddlBlock" name="BlockId" onchange="javascript:GetGramPanchayat(this.value);"><option value="">--Select--</option>
+</select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="lab_name">Gram panchayat</label><span style="color:#a94442;"><b> </b></span>
+                                <div class="input-group">
+                                    <div class="input-group-addon"><i class="fa fa-building"></i></div>
+                                    <select class="form-control _gp" data-val="true" data-val-number="The field GramPanchayatId must be a number." data-val-required="The GramPanchayatId field is required." id="ddlGramPanch" name="GramPanchayatId" onchange="javascript:GetVillage(this.value);"><option value="">--Select--</option>
+</select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="lab_name">Village</label><span style="color:#a94442;"><b> </b></span>
+                                <div class="input-group">
+                                    <div class="input-group-addon"><i class="fa fa-building"></i></div>
+                                    <select class="form-control _Village" data-val="true" data-val-number="The field VillageId must be a number." data-val-required="The VillageId field is required." id="ddlVillage" name="VillageId"><option selected="selected" value="0">--Select--</option>
+</select>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-1">
+                            <div class="form-group" style="float:right;">
+                                <label for="lab_name">&nbsp;</label>
+                                <div class="input-group">
+                                    <a class="btn btn-primary" onclick="javascript:GetData(1);">Show</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-1 w3-right" id="ddlpagination">
+                        <select class="form-control CurentPage" data-val="true" data-val-number="The field CurentPage must be a number." data-val-required="The CurentPage field is required." id="ddlPageNo" name="CurentPage" onchange="javascript:GetData(this.value);"><option selected="selected" value="1">Page No. 1</option>
+</select>
+                    </div>
+                </div>
+
+
+                <div class="table-responsive" id="printpage">
+                    <center style="display:none;" id="hdnheading">
+                        <span style="color: #2494d4;font-size: 19px;font-weight: 700;">Jal Jeevan Mission</span><br />
+                        <font size=4>Water Quality Management Information System</font>
+                        <font size=3><br>Department of Drinking Water & Sanitation, Ministry of Jal Shakti (GOI)</font>
+                        <br /> <br />
+                    </center>
+
+                    <div class="box-body " id="printpage">
+                        <div class="SelectedParameter">
+                            <center>
+                                <b>
+                                    Format L2. Lab testing data
+                                </b>
+                            </center>
+                            <br />
+                            <div style="text-align:left;">
+                                <b style="text-align:left;">Financial Year:</b> <span class="Finyear"></span>,
+                                <b style="text-align:left;"> State:</b> <span class="State_Name"></span>,
+                                <b style="text-align:left;"> District:</b> <span class="District_Name"></span>,
+                                <b style="text-align:left;"> Block:</b> <span class="Block_Name"></span>,
+                                <b style="text-align:left;"> Gram panchayat:</b> <span class="Panchayat_Name"></span>,
+                                <b style="text-align:left;"> Village:</b> <span class="Village_Name"></span>
+                            </div>
+                            <br />
+                        </div>
+
+
+                        <table class="table">
+                            <thead>
+                                <tr style="text-align: center;">
+                                    <th style="width: 3%;" rowspan="2">S.No.</th>
+                                    <th style="width: 13%;text-align: center;" rowspan="2" class="headName">State</th>
+                                    <th style="width: 7%;text-align: center;" colspan="2">No. of Samples Submitted online</th>
+
+                                    <th style="width: 7%;text-align: center;" colspan="2">No. of Samples received in labs </th>
+                                    <th style="width: 21%; text-align: center;" colspan="3">
+                                        No. of samples tested in laboratory
+                                    </th>
+                                    <th style="width: 7%;text-align: center;" rowspan="2">No. of Samples with inconclusive testing results</th>
+                                    <th style="width: 21%;text-align:center;" colspan="3">
+                                        No. of Samples found contaminated
+                                    </th>
+                                    <th style="width: 21%; text-align: center;" colspan="3">
+                                        Remedial measures taken
+                                    </th>
+                                </tr>
+
+
+                                <tr>
+                                    <th style="width: 7%; text-align: center;">
+                                        Total
+                                    </th>
+                                    <th style="width: 7%; text-align: center;">
+                                        Sample submitted online but not received in labs
+                                    </th>
+                                    <th style="width: 7%; text-align: center;">
+                                        Total
+                                    </th>
+                                    <th style="width: 7%; text-align: center;">
+                                        Recieved but not tested
+                                    </th>
+
+                                    <th style="width: 7%; text-align: center;">
+                                        Total
+                                    </th>
+                                    <th style="width: 7%; text-align: center;">
+                                        Samples tested for chemical parameters
+                                    </th>
+                                    <th style="width: 7%; text-align: center;">
+                                        Samples tested for bacteriological parameters
+                                    </th>
+
+                                    <th style="width: 7%; text-align: center;">
+                                        Total no. of Samples found contaminated
+                                    </th>
+                                    <th style="width: 7%; text-align: center;">
+                                        No. of samples with chemical contamination
+                                    </th>
+                                    <th style="width: 7%; text-align: center;">
+                                        No. of samples with bacteriological contamination
+                                    </th>
+
+
+                                    <th style="width: 7%; text-align: center;">
+                                        Total no. of contaminated samples for which remedial measures taken
+                                    </th>
+                                    <th style="width: 7%; text-align: center;">
+                                        Total no. of contaminated samples for which remedial measures taken (chemical contamintaion)
+                                    </th>
+                                    <th style="width: 7%; text-align: center;">
+                                        Total no. of contaminated samples for which remedial measures taken (bacteriological contamination)
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody class="tblLabtesting" style="font-size: 13px;">
+                                        <tr>
+                                            <td>1</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','187','187','0','0','0');">Bagalkote</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',187);"> 6637 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',187);">45 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',187);"> 6592</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',187);"> 12</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',187);"> 6580</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',187);"> 6574</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',187);"> 2328</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',187);"> 11</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',187);"> 60</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',187);"> 54</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',187);"> 6</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',187);"> 60</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',187);"> 54</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',187);"> 6</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','190','190','0','0','0');">Ballari</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',190);"> 4905 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',190);">94 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',190);"> 4811</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',190);"> 77</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',190);"> 4734</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',190);"> 3488</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',190);"> 1283</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',190);"> 2</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',190);"> 400</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',190);"> 356</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',190);"> 44</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',190);"> 390</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',190);"> 355</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',190);"> 35</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','189','189','0','0','0');">Belagavi</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',189);"> 11168 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',189);">66 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',189);"> 11102</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',189);"> 118</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',189);"> 10984</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',189);"> 10889</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',189);"> 3679</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',189);"> 1</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',189);"> 167</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',189);"> 165</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',189);"> 2</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',189);"> 156</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',189);"> 154</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',189);"> 2</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','188','188','0','0','0');">Bengaluru Rural</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',188);"> 6404 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',188);">479 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',188);"> 5925</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',188);"> 144</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',188);"> 5781</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',188);"> 4490</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',188);"> 1430</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',188);"> 1</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',188);"> 70</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',188);"> 40</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',188);"> 30</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',188);"> 70</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',188);"> 40</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',188);"> 30</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','194','194','0','0','0');">Bengaluru Urban</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',194);"> 2437 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',194);">28 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',194);"> 2409</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',194);"> 207</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',194);"> 2202</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',194);"> 2201</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',194);"> 2200</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+0                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',194);"> 7</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',194);"> 6</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',194);"> 3</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',194);"> 5</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',194);"> 4</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',194);"> 3</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>6</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','191','191','0','0','0');">Bidar</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',191);"> 6724 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',191);">330 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',191);"> 6394</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',191);"> 870</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',191);"> 5524</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',191);"> 4393</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',191);"> 1135</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',191);"> 1</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',191);"> 151</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',191);"> 94</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',191);"> 57</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',191);"> 131</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',191);"> 86</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',191);"> 45</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>7</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','212','212','0','0','0');">Chamarajanagara</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',212);"> 5920 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',212);">537 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',212);"> 5383</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',212);"> 593</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',212);"> 4790</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',212);"> 4790</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',212);"> 18</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',212);"> 104</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',212);"> 104</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',212);"> 104</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',212);"> 104</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>8</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','612','612','0','0','0');">Chikkaballapura</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',612);"> 9922 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',612);">96 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',612);"> 9826</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',612);"> 582</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',612);"> 9244</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',612);"> 8117</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',612);"> 1138</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',612);"> 210</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',612);"> 360</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',612);"> 359</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',612);"> 1</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',612);"> 352</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',612);"> 351</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',612);"> 1</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>9</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','193','193','0','0','0');">Chikkamagaluru</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',193);"> 5440 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',193);">90 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',193);"> 5350</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',193);"> 10</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',193);"> 5340</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',193);"> 5247</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',193);"> 1808</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',193);"> 32</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',193);"> 216</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',193);"> 123</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',193);"> 94</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',193);"> 215</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',193);"> 122</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',193);"> 94</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>10</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','213','213','0','0','0');">Chitradurga</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',213);"> 8786 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',213);">392 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',213);"> 8394</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',213);"> 418</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',213);"> 7976</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',213);"> 6402</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',213);"> 2459</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+0                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',213);"> 555</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',213);"> 538</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',213);"> 18</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',213);"> 520</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',213);"> 506</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',213);"> 15</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>11</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','195','195','0','0','0');">Dakshina Kannada</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',195);"> 5092 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',195);">17 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',195);"> 5075</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',195);"> 50</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',195);"> 5025</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',195);"> 5025</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',195);"> 11</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',195);"> 168</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',195);"> 168</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',195);"> 168</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',195);"> 168</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>12</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','210','210','0','0','0');">Davangere</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',210);"> 6385 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',210);">43 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',210);"> 6342</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',210);"> 69</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',210);"> 6273</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',210);"> 5570</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',210);"> 1428</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',210);"> 66</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',210);"> 99</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',210);"> 92</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',210);"> 7</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',210);"> 99</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',210);"> 92</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',210);"> 7</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>13</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','196','196','0','0','0');">Dharwad</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',196);"> 3703 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',196);">115 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',196);"> 3588</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',196);"> 78</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',196);"> 3510</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',196);"> 3510</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',196);"> 3</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+0                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',196);"> 45</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',196);"> 45</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',196);"> 45</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',196);"> 45</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>14</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','208','208','0','0','0');">Gadag</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',208);"> 2663 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',208);">6 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',208);"> 2657</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',208);"> 410</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',208);"> 2247</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',208);"> 2213</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',208);"> 1252</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+0                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',208);"> 37</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',208);"> 36</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',208);"> 2</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',208);"> 31</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',208);"> 31</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>15</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','198','198','0','0','0');">Hassan</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',198);"> 8575 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',198);">66 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',198);"> 8509</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',198);"> 220</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',198);"> 8289</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',198);"> 8267</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',198);"> 2797</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',198);"> 2</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',198);"> 7</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',198);"> 6</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',198);"> 1</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',198);"> 7</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',198);"> 6</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',198);"> 1</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>16</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','209','209','0','0','0');">Haveri</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',209);"> 5979 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',209);">68 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',209);"> 5911</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',209);"> 12</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',209);"> 5899</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',209);"> 5280</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',209);"> 1269</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',209);"> 4</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',209);"> 303</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',209);"> 229</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',209);"> 79</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',209);"> 303</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',209);"> 229</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',209);"> 79</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>17</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','197','197','0','0','0');">Kalaburagi</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',197);"> 7657 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',197);">156 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',197);"> 7501</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',197);"> 255</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',197);"> 7246</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',197);"> 6047</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',197);"> 1231</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',197);"> 3</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',197);"> 336</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',197);"> 310</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',197);"> 27</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',197);"> 324</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',197);"> 306</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',197);"> 19</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>18</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','199','199','0','0','0');">Kodagu</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',199);"> 3323 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',199);">25 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',199);"> 3298</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',199);"> 140</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',199);"> 3158</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',199);"> 3158</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',199);"> 18</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',199);"> 2</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',199);"> 6</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',199);"> 6</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',199);"> 5</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',199);"> 5</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>19</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','200','200','0','0','0');">Kolar</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',200);"> 5481 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',200);">5 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',200);"> 5476</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',200);"> 52</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',200);"> 5424</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',200);"> 4607</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',200);"> 966</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',200);"> 6</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',200);"> 13</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',200);"> 13</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',200);"> 8</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',200);"> 8</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>20</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','207','207','0','0','0');">Koppal</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',207);"> 6390 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',207);">195 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',207);"> 6195</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',207);"> 183</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',207);"> 6012</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',207);"> 5048</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',207);"> 4360</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',207);"> 2</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',207);"> 946</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',207);"> 946</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',207);"> 946</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',207);"> 946</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>21</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','201','201','0','0','0');">Mandya</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',201);"> 5786 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',201);">11 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',201);"> 5775</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',201);"> 23</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',201);"> 5752</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',201);"> 5752</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',201);"> 8</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',201);"> 49</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',201);"> 542</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',201);"> 542</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',201);"> 525</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',201);"> 525</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>22</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','202','202','0','0','0');">Mysuru</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',202);"> 6381 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',202);">83 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',202);"> 6298</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',202);"> 123</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',202);"> 6175</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',202);"> 6175</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',202);"> 3211</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',202);"> 36</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',202);"> 249</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',202);"> 249</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',202);"> 1</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',202);"> 243</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',202);"> 243</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',202);"> 1</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>23</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','203','203','0','0','0');">Raichur</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',203);"> 8546 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',203);">78 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',203);"> 8468</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',203);"> 106</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',203);"> 8362</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',203);"> 7023</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',203);"> 7334</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',203);"> 4</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',203);"> 372</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',203);"> 361</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',203);"> 11</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',203);"> 356</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',203);"> 350</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',203);"> 6</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>24</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','613','613','0','0','0');">Ramanagara</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',613);"> 5775 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',613);">64 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',613);"> 5711</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',613);"> 89</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',613);"> 5622</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',613);"> 5622</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',613);"> 2</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',613);"> 5</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',613);"> 125</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',613);"> 125</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',613);"> 125</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',613);"> 125</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>25</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','204','204','0','0','0');">Shivamogga</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',204);"> 8600 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',204);">121 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',204);"> 8479</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',204);"> 81</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',204);"> 8398</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',204);"> 8398</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',204);"> 4649</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+0                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',204);"> 3</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',204);"> 3</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',204);"> 1</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',204);"> 2</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',204);"> 2</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',204);"> 1</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>26</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','205','205','0','0','0');">Tumakuru</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',205);"> 6219 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',205);">2 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',205);"> 6217</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',205);"> 337</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',205);"> 5880</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',205);"> 5880</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',205);"> 13</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',205);"> 15</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',205);"> 635</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',205);"> 635</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',205);"> 553</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',205);"> 553</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>27</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','211','211','0','0','0');">Udupi</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',211);"> 4622 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',211);">157 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',211);"> 4465</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',211);"> 32</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',211);"> 4433</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',211);"> 4430</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',211);"> 4296</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',211);"> 3</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',211);"> 12</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',211);"> 9</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',211);"> 6</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',211);"> 12</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',211);"> 9</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',211);"> 6</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>28</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','206','206','0','0','0');">Uttara Kannada</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',206);"> 7273 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',206);">35 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',206);"> 7238</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',206);"> 238</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',206);"> 7000</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',206);"> 6578</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',206);"> 1556</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',206);"> 2</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',206);"> 20</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',206);"> 15</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',206);"> 6</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',206);"> 20</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',206);"> 15</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',206);"> 6</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>29</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','822','822','0','0','0');">Vijayanagar</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',822);"> 3019 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',822);">150 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',822);"> 2869</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',822);"> 33</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',822);"> 2836</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',822);"> 2836</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',822);"> 60</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',822);"> 38</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',822);"> 38</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',822);"> 38</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',822);"> 38</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>30</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','192','192','0','0','0');">Vijayapura</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',192);"> 5254 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',192);">56 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',192);"> 5198</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',192);"> 36</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',192);"> 5162</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',192);"> 5162</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',192);"> 5</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+0                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',192);"> 733</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',192);"> 733</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',192);"> 717</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',192);"> 717</a>
+                                            </td>
+                                            <td class="txtnumber">
+0                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>31</td>
+
+
+                                                <td class="txtcontent a">
+                                                    <a href="#" onclick="GetData('1','690','690','0','0','0');">Yadgir</a>
+                                                </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('1',690);"> 7151 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('110',690);">13 </a>
+                                            </td>
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('2',690);"> 7138</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('22',690);"> 315</a>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('3',690);"> 6823</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('14',690);"> 5614</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('15',690);"> 1527</a>
+                                            </td>
+
+
+
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('4',690);"> 81</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('8',690);"> 114</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('9',690);"> 36</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('10',690);"> 78</a>
+                                            </td>
+
+                                            
+
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('11',690);"> 56</a>
+
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('12',690);"> 29</a>
+                                            </td>
+                                            <td class="txtnumber">
+                                                    <a href="#" class="a" onclick="labtestingsample('13',690);"> 27</a>
+                                            </td>
+                                        </tr>
+
+                                <tr style="font-weight: bold; background: #3c8dbc; color: white;">
+                                    <td colspan="2" class="textcontent_center">Total</td>
+                                    <td class="txtnumber">192217</td>
+                                    <td class="txtnumber">3623</td>
+
+                                    <td class="txtnumber">188594</td>
+                                    <td class="txtnumber">5913</td>
+
+                                    <td class="txtnumber">182681</td>
+                                    <td class="txtnumber">168786</td>
+                                    <td class="txtnumber">53385</td>
+
+                                    <td class="txtnumber">627</td>
+                                    <td class="txtnumber">6893</td>
+                                    <td class="txtnumber">6436</td>
+                                    <td class="txtnumber">474</td>
+                                    <td class="txtnumber">6586</td>
+                                    <td class="txtnumber">6218</td>
+                                    <td class="txtnumber">384</td>
+
+                                </tr>
+
+                            </tbody>
+                        </table>
+
+                        <table style="border:collapse collapse;display:none;width:100%" id="hdnfooter">
+                            <tr>
+                            <tr><td align=left class=ReportFooter><i>Source: https://ejalshakti.gov.in </i> </td><td align=right class=ReportFooter></td></tr>
+                            <tr><td>&nbsp;</td><td class=ReportFooter align=right>Report Printed On 10/23/2026 12:52:06 PM</td></tr>
+                        </table>
+
+                    </div>
+                </div>
+
+
+
+
+            </div>
+
+        </section>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+      
+
+
+        if (15== 0) {
+          $(".hdnStateId").val(15);
+          $(".headName").html('State')
+        } else
+            if (0== 0) {
+          $(".hdnStateId").val(15);
+          $(".headName").html('District name')
+        } else  if (0== 0) {
+          $(".hdnStateId").val(15);
+          $(".headName").html('Block name')
+
+        } else  if (0== 0) {
+          $(".hdnStateId").val(15);
+            $(".headName").html('Gram panchayat')
+
+        } else  if (0 == 0) {
+          $(".hdnStateId").val(15);
+          $(".headName").html('Village name')
+        }
+
+
+        if ('2026-2027' == '2025-2026') {
+            $(".hdddlYear option[value=2025-2026]").attr('selected', 'selected');
+        }else  if ('2026-2027' == '2024-2025') {
+            $(".hdddlYear option[value=2024-2025]").attr('selected', 'selected');
+        }else  if ('2026-2027' == '2023-2024') {
+             $(".hdddlYear option[value=2023-2024]").attr('selected', 'selected');
+        }else if ('2026-2027' == '2022-2023')  {
+            $(".hdddlYear option[value=2022-2023]").attr('selected', 'selected');
+        }
+        else if ('2026-2027' == '2021-2022') {
+            $(".hdddlYear option[value=2021-2022]").attr('selected', 'selected');
+        }
+
+
+
+        if (1 == 1) {
+            $("#ddlpagination").hide();
+        }
+        else {
+            $("#ddlpagination").show();
+        }
+
+
+        var _finyear = $("#ddlYear option:selected").text();
+        $('.Finyear').html(_finyear);
+        var _sttext = $("#ddlState option:selected").text();
+        var _dttext = $("#ddlDistrict option:selected").text();
+        if (_sttext == "--Select--") {
+            $('.State_Name').html('All');
+        }
+        else {
+            $('.State_Name').html(_sttext);
+        }
+        if (_dttext == "--Select--") {
+            $('.District_Name').html('All');
+        }
+        else {
+            $('.District_Name').html(_dttext);
+        }
+
+        var _bltext = $("#ddlBlock option:selected").text();
+        if (_bltext == "--Select--") {
+            $('.Block_Name').html('All');
+        }
+        else {
+            $('.Block_Name').html(_bltext);
+        }
+        var _gptext = $("#ddlGramPanch option:selected").text();
+        if (_gptext == "--Select--") {
+            $('.Panchayat_Name').html('All');
+        }
+        else {
+            $('.Panchayat_Name').html(_gptext);
+        }
+        var _villtext = $("#ddlVillage option:selected").text();
+        if (_villtext == "--Select--") {
+            $('.Village_Name').html('All');
+        }
+        else {
+            $('.Village_Name').html(_villtext);
+        }
+
+
+    });
+    function GetSourceCategoryfilter(s_typ_cate) {
+        var filt = $('input[name=source_filter]:checked').val();
+        if (s_typ_cate == 2 || s_typ_cate == 3) {
+            var url = "../Report/Labtesting_source_deleivery?catid=" + s_typ_cate + ""
+            window.open(url, "_self");
+            $("#fhtc").prop("checked", true);
+            return;
+        }
+
+
+
+    }
+
+    function Getyear(_yr) {
+        $(".tblLabtesting").html('');
+    }
+
+    function GetDistrict(_sid) {
+        $(".tblLabtesting").html('');
+
+        if (_sid == " " || _sid == "") {
+            $(".headName").html('State')
+        }
+        else {
+            $(".headName").html('District name')
+        }
+
+        var url = "/WQMIS/Common/District_Bind";
+        $.ajax({
+            url: url,
+            data: {
+                state_id: enCriptedAES(_sid),
+                __RequestVerificationToken: $('[name="__RequestVerificationToken"]').val(),
+            },
+            cache: false,
+            type: "POST",
+            success: function (data) {
+
+                if (data.length > 0) {
+                    var markup = '';
+                   // markup += "<option value>" + "--Select--" + "</option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].JJM_DistrictId + ">" + data[x].DistrictName + "</option>";
+                    }
+                    $("#ddlDistrict").html(markup).show();
+
+                    $("#ddlBlock").empty();
+                    $("#ddlBlock").append('<option value="">--Select--</option>');
+
+                    $("#ddlGramPanch").empty();
+                    $("#ddlVillage").empty();
+                    $("#ddlGramPanch").append('<option value="">--Select--</option>');
+                    $("#ddlVillage").append('<option value="">--Select--</option>');
+                }
+                else {
+                    $("#ddlBlock").empty();
+                    $("#ddlDistrict").empty();
+                    $("#ddlDistrict").append('<option value>--Select--</option>');
+                    $("#ddlBlock").append('<option value>--Select--</option>');
+                    $("#ddlGramPanch").empty();
+                    $("#ddlVillage").empty();
+                    $("#ddlGramPanch").append('<option value="">--Select--</option>');
+                    $("#ddlVillage").append('<option value="">--Select--</option>');
+                }
+            },
+
+        });
+    }
+    function GetBlock(_dis) {
+
+        $(".tblLabtesting").html('');
+        var url = "../Common/Block_Bind/";
+        var state_id = $("#ddlState option:selected").val();
+        $.ajax({
+            url: url,
+            data: {
+                state_id: enCriptedAES(state_id),
+                District_id: enCriptedAES(_dis),
+                __RequestVerificationToken: $('[name="__RequestVerificationToken"]').val(),
+            },
+            cache: false,
+            type: "POST",
+            async: false,
+            success: function (data) {
+
+                if (data.length > 0) {
+                    var markup = '';
+                    //  markup += "<option>" + "--Select Block--" + "</option>";
+                        for (var x = 0; x < data.length; x++) {
+                            markup += "<option value=" + data[x].JJM_BlockId + ">" + data[x].BlockName + "</option>";
+                        }
+                    $("#ddlBlock").html(markup).show();
+                    $("#ddlGramPanch").empty();
+                    $("#ddlVillage").empty();
+                    $("#ddlGramPanch").append('<option value="">--Select--</option>');
+                    $("#ddlVillage").append('<option value="">--Select--</option>');
+                }
+                else {
+                    $("#ddlBlock").empty();
+                    $("#ddlGramPanch").empty();
+                    $("#ddlVillage").empty();
+                    $("#ddlGramPanch").append('<option value="">--Select--</option>');
+                    $("#ddlVillage").append('<option value="">--Select--</option>');
+
+                }
+            },
+
+        });
+    }
+    function GetGramPanchayat() {
+        $(".tblLabtesting").html('');
+        var state_id = $("#ddlState option:selected").val();
+        var _dis = $("#ddlDistrict option:selected").val();
+        var bl_id = $("#ddlBlock option:selected").val();
+        var url = "../Common/GetGramPanchayat_Bind/";
+        $.ajax({
+            url: url,
+            data: {
+                state_id: enCriptedAES(state_id),
+                District_id: enCriptedAES(_dis),
+                Block_id: enCriptedAES(bl_id),
+                __RequestVerificationToken: $('[name="__RequestVerificationToken"]').val(),
+            },
+            cache: false,
+            type: "POST",
+            async: false,
+            success: function (data) {
+
+                if (data.length > 0) {
+                    var markup = '';
+                    //  markup += "<option value>" + "--Select Grampanchayat--" + "</option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].JJM_PanchayatId + ">" + data[x].PanchayatName + "</option>";
+                    }
+                    $("#ddlVillage").empty();
+                    $("#ddlVillage").append('<option value="">--Select--</option>');
+                    $("#ddlGramPanch").html(markup).show();
+                }
+                else {
+                    $("#ddlGramPanch").empty();
+                    $("#ddlVillage").empty();
+                    $("#ddlGramPanch").append('<option value="">--Select--</option>');
+                    $("#ddlVillage").append('<option value="">--Select--</option>');
+
+                }
+            },
+
+        });
+    }
+    function GetVillage() {
+        $(".tblLabtesting").html('');
+        var state_id = $("#ddlState option:selected").val();
+        var _dis = $("#ddlDistrict option:selected").val();
+        var bl_id = $("#ddlBlock option:selected").val();
+        var gp_id = $("#ddlGramPanch option:selected").val()
+
+        var url = "../Common/GetVillage_Bind/";
+        $.ajax({
+            url: url,
+            data: {
+                state_id: enCriptedAES(state_id),
+                District_id: enCriptedAES(_dis),
+                Block_id: enCriptedAES(bl_id),
+                Grampanchayat_id: enCriptedAES(gp_id),
+                __RequestVerificationToken: $('[name="__RequestVerificationToken"]').val(),
+            },
+            cache: false,
+            type: "POST",
+            async: false,
+            success: function (data) {
+
+                if (data.length > 0) {
+                    var markup = '';
+                    //   markup += "<option value>" + "--Select Village--" + "</option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].JJM_VillageId + ">" + data[x].VillageName + "</option>";
+                    }
+                    $("#ddlVillage").html(markup).show();
+                }
+                else {
+                    $("#ddlVillage").empty();
+                    //   $("#ddlVillage").append('<option value="">-- Select Village --</option>');
+                }
+            },
+
+        });
+    }
+</script>
+
+<script>
+
+    function GetData(_Id, state = '', district = '', block = '', gp = '', village = '') {
+
+        if (state != '' && $('select#ddlState option:selected').val() == ' ') {
+            $('#ddlState').val(state);
+            GetDistrict(state)
+        }
+        if (district != '' && $('select#ddlDistrict option:selected').val() == '') {
+            $('#ddlDistrict').val(district);
+            GetBlock(district);
+        }
+        else if (district != '' && district != 0 && $('select#ddlDistrict option:selected').val() == ' ') {
+            $('#ddlDistrict').val(district);
+            GetBlock(district);
+        }
+        if (block != '' && block != 0 && $('select#ddlBlock option:selected').val() == '') {
+            $('#ddlBlock').val(block);
+            GetGramPanchayat();
+        }
+        if (gp != '' && gp != 0 && $('select#ddlGramPanch option:selected').val() == '') {
+            $('#ddlGramPanch').val(gp);
+            GetVillage();
+        }
+        if (village != '' && village != 0 && $('select#ddlVillage option:selected').val() == '') {
+            $('#ddlVillage').val(village);
+        }
+
+        var _fy = $('select#ddlYear option:selected').val();
+        var _st = $('select#ddlState option:selected').val();
+        var _dt = $('select#ddlDistrict option:selected').val();
+        var _bl = $('select#ddlBlock option:selected').val();
+        var _gp = $('select#ddlGramPanch option:selected').val();
+        var _vil = $('select#ddlVillage option:selected').val();
+        if (_st == "" || _st == " ") {
+            _st = 0;
+            _dt = 0;
+            _bl = 0;
+            _gp = 0;
+            _vil = 0;
+            $(".headName").html('State')
+        } else if (_dt == " " || _dt == "") {
+            _dt = 0;
+            _bl = 0;
+            _gp = 0;
+            _vil = 0;
+            $(".headName").html('District name')
+        } else if (_bl == "") {
+            _bl = 0;
+            _gp = 0;
+            _vil = 0;
+            $(".headName").html('Block name')
+        }
+        else if (_gp == "" || _gp == " ") {
+            _gp = 0;
+            _vil = 0;
+            $(".headName").html('Grampanchayat name')
+        }
+        else if (_vil == "" || _vil == " ") {
+            _vil = 0;
+            $(".headName").html('Village name')
+        }
+        else {
+            $(".headName").html('Village name')
+        }
+
+        var _finyear = $("#ddlYear option:selected").text();
+        $('.Finyear').html(_finyear);
+        var _sttext = $("#ddlState option:selected").text();
+        var _dttext = $("#ddlDistrict option:selected").text();
+        if (_sttext == "--Select--") {
+            $('.State_Name').html('All');
+        }
+        else {
+            $('.State_Name').html(_sttext);
+        }
+        if (_dttext == "--Select--") {
+            $('.District_Name').html('All');
+        }
+        else {
+            $('.District_Name').html(_dttext);
+        }
+
+        var _bltext = $("#ddlBlock option:selected").text();
+        if (_bltext == "--Select--") {
+            $('.Block_Name').html('All');
+        }
+        else {
+            $('.Block_Name').html(_bltext);
+        }
+        var _gptext = $("#ddlGramPanch option:selected").text();
+        if (_gptext == "--Select--") {
+            $('.Panchayat_Name').html('All');
+        }
+        else {
+            $('.Panchayat_Name').html(_gptext);
+        }
+        var _villtext = $("#ddlVillage option:selected").text();
+        if (_villtext == "--Select--") {
+            $('.Village_Name').html('All');
+        }
+        else {
+            $('.Village_Name').html(_villtext);
+        }
+
+
+        var _cpage = _Id;
+        var url = "../Report/GetLabtestingdata";
+        var ulplan = '';
+        $(".tblLabtesting").html('');
+        $.ajax({
+            url: url,
+            data: {
+                cpage: enCriptedAES(_cpage),
+                st: enCriptedAES(_st),
+                dt: enCriptedAES(_dt),
+                bl: enCriptedAES(_bl),
+                gp: enCriptedAES(_gp),
+                vill: enCriptedAES(_vil),
+                fy: enCriptedAES(_fy)
+            },
+            cache: false,
+            type: "Get",
+            success: function (data) {
+
+                if (data.Labtestingdata.length > 0) {
+                    for (var x = 0; x < data.Labtestingdata.length; x++) {
+
+                        ulplan += '<tr>';
+                        ulplan += '<td>' + data.Labtestingdata[x].SNo + '</td>';
+
+                        if (data.Labtestingdata[x].VillageId == 0) {
+                            ulplan += '<td class="txtcontent a"><a href="#"  onclick="GetData(' + "'1'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ',' + "'" + data.Labtestingdata[x].DistrictId + "'" + ',' + "'" + data.Labtestingdata[x].BlockId + "'" + ',' + "'" + data.Labtestingdata[x].GramPanchayatId + "'" + ',' + "'" + data.Labtestingdata[x].VillageId + "'" + ')"> ' + data.Labtestingdata[x].State + '</a></td>';
+                        }
+                        else {
+                            ulplan += '<td class="txtcontent">' + data.Labtestingdata[x].State + '</td>';
+                        }
+
+                        if (data.Labtestingdata[x].Sample_Submited_online == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Sample_Submited_online + '</td>';
+                        }
+                        else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'1'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Sample_Submited_online + '</a></td>';
+                        }
+
+                        if (data.Labtestingdata[x].Sample_Submited_online_not_received == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Sample_Submited_online_not_received + '</td>';
+                        }
+                        else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'110'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Sample_Submited_online_not_received + '</a></td>';
+                        }
+
+                        if (data.Labtestingdata[x].Sample_Received_labs == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Sample_Received_labs + '</td>';
+                        }
+                        else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'2'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Sample_Received_labs + '</a></td>';
+                        }
+
+                        if (data.Labtestingdata[x].Sample_Received_labs_not_tested == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Sample_Received_labs_not_tested + '</td>';
+                        }
+                        else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'22'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Sample_Received_labs_not_tested + '</a></td>';
+                        }
+
+                        //========================sample tested======
+                        if (data.Labtestingdata[x].Sample_tested == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Sample_tested + '</td>';
+                        }
+                        else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'3'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Sample_tested + '</a></td>';
+                        }
+                        if (data.Labtestingdata[x].Sample_tested_chem == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Sample_tested_chem + '</td>';
+                        }
+                        else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'14'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Sample_tested_chem + '</a></td>';
+                        }
+                        if (data.Labtestingdata[x].Sample_tested_bact == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Sample_tested_bact + '</td>';
+                        }
+                        else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'15'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Sample_tested_bact + '</a></td>';
+                        }
+
+                        //===============end====
+
+
+                        if (data.Labtestingdata[x].Sample_Inconclusive_testing_res == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Sample_Inconclusive_testing_res + '</td>';
+                        }
+                        else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'4'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Sample_Inconclusive_testing_res + '</a></td>';
+                        }
+                        if (data.Labtestingdata[x].Samples_contaminated == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Samples_contaminated + '</td>';
+                        } else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'8'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Samples_contaminated + '</a></td>';
+                        }
+                        if (data.Labtestingdata[x].Samples_chemical_contamination == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Samples_chemical_contamination + '</td>';
+                        } else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'9'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Samples_chemical_contamination + '</a></td>';
+                        }
+                        if (data.Labtestingdata[x].Samples_bacteriological_contamination == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Samples_bacteriological_contamination + '</td>';
+                        } else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'10'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Samples_bacteriological_contamination + '</a></td>';
+                        }
+
+                        //ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Sample_remedials_contaminated + '</td>';
+                        //ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Samples_remedial_chemicalcontamination + '</td>';
+                        //ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Samples_remedial_bacteriologicalcontamination + '</td>';
+                        if (data.Labtestingdata[x].Sample_remedials_contaminated == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Sample_remedials_contaminated + '</td>';
+                        }
+                        else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'11'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Sample_remedials_contaminated + '</a></td>';
+                        }
+                        if (data.Labtestingdata[x].Samples_remedial_chemicalcontamination == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Samples_remedial_chemicalcontamination + '</td>';
+                        }
+                        else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'12'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Samples_remedial_chemicalcontamination + '</a></td>';
+                        }
+
+                        if (data.Labtestingdata[x].Samples_remedial_bacteriologicalcontamination == 0 || _st == 0) {
+                            ulplan += '<td class="txtnumber">' + data.Labtestingdata[x].Samples_remedial_bacteriologicalcontamination + '</td>';
+                        }
+                        else {
+                            ulplan += '<td class="txtnumber a"><a href="#"  onclick="labtestingsample(' + "'13'" + ',' + "'" + data.Labtestingdata[x].StateId + "'" + ')">' + data.Labtestingdata[x].Samples_remedial_bacteriologicalcontamination + '</a></td>';
+                        }
+
+                        ulplan += '</tr>';
+                    }
+
+                    ulplan += "<tr style='font-weight: bold; background: #3c8dbc; color: white;'><td colspan='2' class='textcontent_center'><b>Total</b></td><td class='txtnumber'><b>" + data.TotalSample_Submited_online + "</b></td><td class='txtnumber'><b>" + data.Sample_Submited_online_not_received + "</b></td><td class='txtnumber'><b>" + data.TotalSample_Received_labs + "</b></td><td class='txtnumber'><b>" + data.Sample_Received_labs_not_tested + "</b></td><td class='txtnumber'><b>" + data.TotalSample_tested + "</b></td><td class='txtnumber'><b>" + data.TotalSample_tested_chem + "</b></td><td class='txtnumber'><b>" + data.TotalSample_tested_bact + "</b></td><td class='txtnumber'><b>" + data.TotalSample_Inconclusive_testing_res + "</b></td><td class='txtnumber'><b>" + data.TotalSamples_contaminated + "</b></td><td class='txtnumber'><b>" + data.TotalSamples_chemical_contamination + "</b></td><td class='txtnumber'>" + data.TotalSamples_bacteriological_contamination + "</td>";
+                    ulplan += "<td class='txtnumber'><b>" + data.TotalSample_remedials_contaminated + "</b></td><td class='txtnumber'><b>" + data.TotalSamples_remedial_chemicalcontamination + "</b></td><td class='txtnumber'><b>" + data.TotalSamples_remedial_bacteriologicalcontamination + "</b></td></tr>";
+
+                    $(".tblLabtesting").append(ulplan);
+
+                    if (data.TotalPage > 1) {
+                        $("#ddlpagination").show();
+                        GetddlPag(data.TotalPage, data.CurentPage);
+                    }
+                    else {
+                        $("#ddlpagination").hide();
+                    }
+                }
+                else {
+                    ulplan += '<tr><td colspan="16" class="textcontent_center" style="text-align: end;color: red;">Record not available </td></tr>';
+                    $(".tblLabtesting").append(ulplan);
+                    $("#ddlpagination").hide();
+                }
+            },
+        });
+    }
+
+    function GetddlPag(_TotalPage, CurentPage) {
+        var url = "../Report/GetddlPaging/";
+        $.ajax({
+            url: url,
+            data: { TotPage: _TotalPage },
+            cache: false,
+            type: "POST",
+            async: false,
+            success: function (data) {
+                if (data.length > 0) {
+                    var markup = '';
+
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].PageNo + ">" + data[x].PageNotitle + "</option>";
+                    }
+                    $("#ddlPageNo").html(markup).show();
+                    $(".CurentPage").val(CurentPage);
+                }
+                else {
+                    $("#ddlPageNo").empty();
+                }
+            },
+
+        });
+    }
+</script>
+<script src="/WQMIS/Scripts/enc-base64-min.js"></script>
+<script src="/WQMIS/Scripts/aes.js"></script>
+
+<script>
+    function labtestingsample(cstatus, Id) {
+
+        var _fy = $('#ddlYear').val();
+        var _st = $('#ddlState').val();
+        var _dt = $('#ddlDistrict').val();
+        var _bl = $('#ddlBlock').val();
+        var _gp = $('#ddlGramPanch').val();
+        var _vil = $('#ddlVillage').val();
+
+        if (_st == "" || _st == " ") {
+            _st = "0";
+        }
+        if (_dt == " " || _dt == "") {
+            _dt = "0";
+        }
+
+        if (_bl == "" || _bl == " ") {
+            _bl = "0";
+        }
+        if (_gp == "" || _gp == " ") {
+            _gp = "0";
+        }
+        if (_vil == "" || _vil == " ") {
+            _vil = "0";
+        }
+
+        var _stId = "0";
+        var _dtId = "0";
+        var _blId = "0";
+        var _gpId = "0";
+        var _vilId = "0";
+
+
+        if (_st == "0" && _dt == "0" && _bl == "0" && _gp == "0" && _vil == "0") {
+            _stId = Id;
+        }
+        else if (_st != "0" && _dt == "0" && _bl == "0" && _gp == "0" && _vil == "0") {
+            _stId = _st;
+            _dtId = Id;
+        }
+        else if (_st != "0" && _dt != "0" && _bl == "0" && _gp == "0" && _vil == "0") {
+            _stId = _st;
+            _dtId = _dt;
+            _blId = Id;
+        }
+        else if (_st != "0" && _dt != "0" && _bl != "0" && _gp == "0" && _vil == "0") {
+            _stId = _st;
+            _dtId = _dt;
+            _blId = _bl;
+            _gpId = Id;
+        }
+        else if (_st != "0" && _dt != "0" && _bl != "0" && _gp != "0" && _vil == "0") {
+            _stId = _st;
+            _dtId = _dt;
+            _blId = _bl;
+            _gpId = _gp;
+            _vilId = Id;
+        }
+        else {
+            _stId = _st;
+            _dtId = _dt;
+            _blId = _bl;
+            _gpId = _gp;
+            _vilId = Id;
+        }
+
+        location.href = "../Report/labtestingsamplelist?currentstatus=" + enCriptedAES(cstatus) + "&fy=" + enCriptedAES(_fy) + "&stid=" + enCriptedAES(_stId) + "&dtid=" + enCriptedAES(_dtId) + "&blid=" + enCriptedAES(_blId) + "&gpid=" + enCriptedAES(_gpId) + "&villid=" + enCriptedAES(_vilId) + ""
+    }
+</script>
+            
+        </div>
+
+        <footer class="main-footer">
+            <h4 id="spndatetime" class="spndatetime" hidden="hidden" style="text-align:right;">10/23/2026 12:52:06 PM</h4>
+            <div class="pull-right hidden-xs">
+                You will be logged out for inactivity.
+            </div>
+            <strong>Designed & developed by  <a href="#">NIC </a>.</strong> Copyright © NJJM 2020
+        </footer>
+        <div class="control-sidebar-bg"></div>
+
+    </div>
+
+</body>
+
+</html>

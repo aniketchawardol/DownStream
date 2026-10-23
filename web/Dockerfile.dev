@@ -1,0 +1,13 @@
+# Dev-only: Vite dev server with hot reload. Production builds the same web/ source inside services/api/Dockerfile.
+FROM node:22-slim
+WORKDIR /repo
+COPY package.json package-lock.json ./
+COPY packages/core/package.json packages/core/
+COPY services/api/package.json services/api/
+COPY services/worker/package.json services/worker/
+COPY web/package.json web/
+RUN npm ci
+COPY packages/core packages/core
+COPY web web
+EXPOSE 5173
+CMD ["npm", "run", "dev", "--workspace", "web"]

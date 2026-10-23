@@ -1,0 +1,1071 @@
+
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>JJM-WQMIS</title>
+    <link rel="shortcut icon" href="/WQMIS/Image/favicon.ico">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <link rel="stylesheet" href="/WQMIS/admin/css/bootstrap.min.css">
+    <link href="/WQMIS/admin/css/font-awesome.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="/WQMIS/admin/css/all-skins.min.css">
+    <link href="/WQMIS/admin/css/AdminLTE.min.css" rel="stylesheet" />
+    <script src="/WQMIS/Scripts/jquery.min.js"></script>
+        <script src="/WQMIS/admin/Js/bootstrap.min.js"></script>
+
+    <script src="/WQMIS/admin/Js/adminlte.min.js"></script>
+    <link href="/WQMIS/admin/css/w3.css" rel="stylesheet" />
+    <script src="/WQMIS/admin/Js/SHA512.js"></script>
+    <link href="/WQMIS/admin/Datatable/jquery.dataTables.min.css" rel="stylesheet" />
+
+    <script src="/WQMIS/Scripts/frmValidate.js"></script>
+
+
+    <link href="/WQMIS/Content/datatable/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="/WQMIS/admin/Datatable/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="/WQMIS/admin/Datatable/jquery.dataTables.min.js"></script>
+    <link href="/WQMIS/admin/Datatable/buttons.dataTables.min.css" rel="stylesheet" />
+    <script src="/WQMIS/admin/Datatable/dataTables.buttons.min.js"></script>
+
+
+    
+    <script src="/WQMIS/Content/datatable/dataTables.buttons.js"></script>
+    <script src="/WQMIS/Content/datatable/buttons.html5.js"></script>
+    <script src="/WQMIS/Content/datatable/buttons.print.js"></script>
+    
+
+
+    <script src="/WQMIS/admin/Datatable/jszip.min.js"></script>
+    <script src="/WQMIS/admin/Datatable/pdfmake.min.js"></script>
+    <script src="/WQMIS/admin/Datatable/vfs_fonts.js"></script>
+    <script src="/WQMIS/Scripts/globalFinYear.js"></script>
+
+    <link href="/WQMIS/Content/grid.css" rel="stylesheet" />
+    <style>
+
+        li.treeview.menu-open a {
+            border-left-color: #43daff !important;
+        }
+
+
+
+        .skin-blue .sidebar-menu > li:hover > a, .skin-blue .sidebar-menu > li.active > a, .skin-blue .sidebar-menu > li.menu-open > a {
+            border-left-color: #43daff !important;
+        }
+
+
+        .treeview.menu-open > .treeview-menu {
+            display: block;
+        }
+    </style>
+
+    <script src="/WQMIS/Content/kendo.all.min.js"></script>
+    <script src="/WQMIS/Content/Print.js"></script>
+
+    <script type="text/javascript">
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+    </script>
+
+    <script>
+        jQuery(function ($) {
+            //var path = window.location.href;
+            var path = window.location.href.replace(/#/g, '');
+            // because the 'href' property of the DOM element is the absolute path
+            $('ul a').each(function () {
+                if (this.href === path) {
+                    $(this).addClass('active_menu-open');
+                }
+            });
+        });
+        $(document).ready(function () {
+            $(".active_menu-open").parentsUntil("treeview").addClass("menu-open");
+            //let tk = sessionStorage.getItem("GGTRYU-e664a07a-9c5d-49ba-98ed-fabe9c6f58bb");
+            //$.ajax({
+            //    type: "GET",
+            //    asnc: false,
+            //    url: '/Home/chtk',
+            //      headers: { "tk": tk },
+            // /*   data: {tk:tk},*/
+            //    success: function (data) {
+            //        debugger;
+            //        if (!data) {
+            //            alert();
+            //            var url = "../Error/Error";
+            //            window.location.href = $(location).attr('host') + '/Error/Error';
+            //            sessionStorage.clear();
+            //        }
+            //    },
+            //    error: function () {
+            //        var url = "../Error/Error";
+            //        window.location.href = url;
+            //        sessionStorage.clear();
+            //    }
+
+            //});
+
+
+
+            function ajaxindicatorstart(text) {
+                if ($('body').find('#resultLoading').attr('id') != 'resultLoading') {
+                    $('body').append('<div id="resultLoading" style="display:none"><div><div id="cssload-loader"><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div><div class="cssload-dot"></div></div><div>' + text + '</div></div><div class="bg"></div></div>');
+                }
+                $('#resultLoading').css({
+                    'width': '100%',
+                    'height': '100%',
+                    'position': 'fixed',
+                    'z-index': '10000000',
+                    'top': '0',
+                    'left': '0',
+                    'right': '0',
+                    'bottom': '0',
+                    'margin': 'auto'
+                });
+                $('#resultLoading .bg').css({
+                    'background': '#000000',
+                    'opacity': '0.7',
+                    'width': '100%',
+                    'height': '100%',
+                    'position': 'absolute',
+                    'top': '0'
+                });
+                $('#resultLoading>div:first').css({
+                    'width': '250px',
+                    'height': '75px',
+                    'text-align': 'center',
+                    'position': 'fixed',
+                    'top': '0',
+                    'left': '0',
+                    'right': '0',
+                    'bottom': '0',
+                    'margin': 'auto',
+                    'font-size': '16px',
+                    'z-index': '10',
+                    'color': '#ffffff'
+
+                });
+                $('#resultLoading .bg').height('100%');
+                $('#resultLoading').fadeIn(300);
+                $('body').css('cursor', 'wait');
+            }
+            function ajaxindicatorstop() {
+                $('#resultLoading .bg').height('100%');
+                $('#resultLoading').fadeOut(300);
+                $('body').css('cursor', 'default');
+            }
+            $(document).ajaxStart(function () {
+                var hideajax = 0;
+                hideajax = document.getElementById("txthideajax");
+                if (hideajax == null) {
+                    ajaxindicatorstart('Processing.. please wait..');
+                }
+            }).ajaxStop(function () {
+                ajaxindicatorstop();
+            });
+            //$(document).ajaxError(function () {
+            //    let url = "../Error/Error";
+            //    window.open(url, "_self");
+            //});
+           if(13 == 7 || 13 == 4)
+                Getlanguage();
+            if(13 == 10)
+                Getlanguage();
+
+
+
+               if ('' == 'False' && 13 == 2)
+                      $(".sidebar-menu").css("display", "none");
+             else
+                       $(".sidebar-menu").css("display", "block");
+
+            $("#ddllanguage").change(function () {
+
+                let lang = $("#ddllanguage option:selected").val();
+                var url1 = window.location.href;
+                let url = "../Common/ChangeLanguage?lang=" + lang + "&url=" + url1 + " ";
+                localStorage.setItem("lang", lang);
+                setCookie('lang', lang)
+                window.open(url, "_self");
+            });
+
+
+
+
+        });
+
+
+        function setCookie(key, value, days) {
+            var expires = new Date();
+            expires.setTime(expires.getTime() + 31536000000); //1 year
+            document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+        }
+
+        function Getlanguage() {
+            var url = "../Common/Getlanguage/";
+            $.ajax({
+                url: url,
+
+                cache: false,
+                type: "POST",
+                async: false,
+                success: function (data) {
+
+                    if (data.length > 0) {
+                        var markup = '';
+                        for (var x = 0; x < data.length; x++) {
+                            markup += "<option value=" + data[x].LanguageCultureName + ">" + data[x].LanguageFullName + "</option>";
+
+                        }
+                        $("#ddllanguage").html(markup).show();
+
+                    }
+                    else {
+                        $("#ddllanguage").empty();
+
+                    }
+
+                },
+
+            });
+            ;
+            let lg = localStorage.getItem("lang");
+            $("#ddllanguage").val(lg);
+        }
+
+    </script>
+
+    <script>
+        //function GetExcelContent() {
+
+        //    $("input[name='GridHtml']").val($("#printpage").html());
+
+        //    $("input[name='FileName']").val($("#ReportHeading").html());
+        //}
+        function GetExcelContent() {
+            if ($('#printpage .post_m').is(":hidden") == true) {
+                $("#hdnhtml").html($("#printpage").html());
+                $("#hdnhtml").css("display", "block");
+                $("#hdnhtml").find('.post_m').remove();
+                $("input[name='GridHtml']").val($("#hdnhtml").html());
+                $("#hdnhtml").html('');
+                $("#hdnhtml").css("display", "none");
+            }
+            else {
+                $("input[name='GridHtml']").val($("#printpage").html());
+            }
+            /* $("input[name='GridHtml']").val($("#hdnhtml").html());*/
+            $("input[name='FileName']").val($("#ReportHeading").html());
+        }
+
+        function GetExcelContent1() {
+            if ($('#printpage1 .post_m').is(":hidden") == true) {
+                $("#hdnhtml1").html($("#printpage1").html());
+                $("#hdnhtml1").css("display", "block");
+                $("#hdnhtml1").find('.post_m').remove();
+                $("input[name='GridHtml1']").val($("#hdnhtml1").html());
+                $("#hdnhtml1").html('');
+                $("#hdnhtml1").css("display", "none");
+            }
+            else {
+                $("input[name='GridHtml1']").val($("#printpage1").html());
+            }
+            /* $("input[name='GridHtml']").val($("#hdnhtml").html());*/
+            $("input[name='FileName1']").val($("#ReportHeading1").html());
+        }
+
+
+        function ExporttablePdf2() {
+
+            $("#hdnheading").show();
+            $("#hdnfooter").show();
+            // $(".grid-footer").hide();
+            var printDate = $("#spndatetime").html();
+            $("#printDate").text('Printed on : ' + printDate);
+
+
+            var FileName = $("#ReportHeading").html();
+
+            kendo.drawing.drawDOM("#printpage",
+                {
+                    paperSize: "A4",
+                    //landscape: true,
+                    margin: { left: ".5cm", top: ".1cm", right: ".5cm", bottom: ".1cm" },
+                    scale: 0.5,
+                    height: 500,
+                    repeatHeaders: true
+                })
+                .then(function (group) {
+                    $("#hdnheading").hide();
+                    $("#hdnfooter").hide();
+                    $("#printpage a").addClass("href").css("cursor", "pointer");
+                    return kendo.drawing.exportPDF(group, {
+                        paperSize: "a4",
+                        margin: { left: ".5cm", top: ".1cm", right: ".5cm", bottom: ".1cm" },
+                    }).done(function (data) {
+                        kendo.saveAs({
+                            dataURI: data,
+                            fileName: FileName + ".pdf"
+                        });
+                    });
+                });
+        }
+    </script>
+
+
+    <style>
+        .wqmis_menu .active a {
+            border-left-color: #3c8dbc;
+        }
+
+
+        li.menu-open > a {
+            border-left-color: #00c0ef !important;
+        }
+
+        ::selection {
+            color: #fff;
+            background: #2d8efe;
+            /* font-size: 14px;*/
+        }
+
+        ::-moz-selection {
+            color: #fff;
+            background: #2d8efe;
+            /*font-size: 14px;*/
+        }
+    </style>
+
+</head>
+
+<body class="hold-transition skin-blue sidebar-mini">
+
+
+    <div class="wrapper">
+        <div id="hdnhtml" style="display:none;"></div>
+        <header class="main-header">
+            <a href="#" class="logo">
+                <span class="logo-mini"></span>
+                <span class="logo-lg"><b>JJM-WQMIS</b> </span>
+            </a>
+            <nav class="navbar navbar-static-top" role="navigation">
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                </a>
+
+
+            </nav>
+        </header>
+
+        <aside class="main-sidebar">
+            <section class="sidebar">
+
+                <div class="user-panel">
+                    <div class="pull-left image">
+                        <img src="/WQMIS/admin/img/jjm_new_logo.svg" class="img-circle" alt="User Image">
+                    </div>
+                    <div class="pull-left info">
+                                            </div>
+                </div>
+
+                <ul class="sidebar-menu" data-widget="tree">
+                    <li class="header">NAVIGATION MENU</li>
+                        <li class="active"><a href="/WQMIS/Main/Index" style="background: #0684d2; "><i class="fa fa-home"></i> <span>Home</span></a></li>
+                        <li class=""><a href="/WQMIS/Report/Index" style=" background: #024873; color: white;"><i class="fa fa-list"></i> <span>Report / Analytics</span></a></li>
+
+
+                </ul>
+            </section>
+        </aside>
+
+        <div class="content-wrapper">
+
+                <input type="hidden" class="hdnsession" value="Guest" />
+
+            
+
+
+<style>
+
+    .co-button {
+        float: right;
+        margin: 0px -30px;
+        height: 38px;
+    }
+
+    .txtnumber {
+        text-align: right;
+    }
+
+    .txtcontent {
+        text-align: left;
+    }
+
+    .textcontent_center {
+        text-align: center;
+    }
+
+    th {
+        vertical-align: middle !important;
+    }
+
+    .pewright {
+        float: right !important;
+    }
+
+    .SelectedParameter {
+        display: none;
+        font-weight: bold;
+        text-align: left;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <section class="content-header">
+            <div class="row">
+                <div class="col-sm-9">
+                    <h4>
+                        <span id="ReportHeading">Format L2. List of samples where samples  with found contaminated  </span> &nbsp;
+                        <a class="btn btn-primary" href="/WQMIS/Report/Labtestingdata?fy=ni369euDLLUKADXqJfCMlA==&stid=n4y3XImHOT34OR3rSpPhoQ==&dtid=n0aEfYhRFcsQq4GHwMv0ag==&blid=V4QrwEjQYoWNv1aollfiTQ==&gpid=rVJO3lG/mOFqgnBQKfD4WA==&viid=rVJO3lG/mOFqgnBQKfD4WA==" style="font-size: 9px;"> <i class="fa fa-backward"></i> Back</a>
+                    </h4>
+                </div>
+
+                <div class="col-sm-1">
+
+                </div>
+
+                <div class="col-sm-2">
+                    <div class="pewright">
+<form action="/WQMIS/Report/ExportToExcel" method="post">                            <input type="hidden" name="GridHtml" />
+                            <input type="hidden" name="FileName" />
+                            <button onclick="GetExcelContent()" style="border: none;">
+                                <i class="fa fa-file-excel-o w3-xlarge" style="color: green; padding-left: 20px;"></i>
+                            </button>
+</form>                    </div>
+                    <div class="pewright">
+                        <a href="#" onclick="printdiv();return false;">
+                            <img class="headrIcone" />
+                            <i class="fa fa-print w3-xlarge" style="color: #003b64; padding-left: 20px;"></i>
+                        </a>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+
+        <section class="content container-fluid paddinglist">
+            <div class="box box-primary">
+                <input type="hidden" name="hdnStateId" class="hdnStateId" value="15" />
+                <input name="__RequestVerificationToken" type="hidden" value="S6THGS2ohr7M47Zz7IOk7WLlaiqVcYgM6MqefBszGKQCQmaiFp0540B2OZ6Ab2oX4Klz31kjoACc5nau_B2E0_Ov7pE1" />
+
+                <div class="row">
+                    <div class="col-sm-10" id="execel">
+                        <a href="/WQMIS/Report/ExportToExcellabtestingsample?p_type=BCVVfohrSBjOIIUrSG8vog==&fy=ni369euDLLUKADXqJfCMlA==&stid=n4y3XImHOT34OR3rSpPhoQ==&dtid=n0aEfYhRFcsQq4GHwMv0ag==&blid=V4QrwEjQYoWNv1aollfiTQ==&gpid=rVJO3lG/mOFqgnBQKfD4WA==&&villid=rVJO3lG/mOFqgnBQKfD4WA==" style="font-size: 12px;">
+                            <i class="fa fa-file-excel-o w3-xlarge" style="color: blue; margin-top: 5px; margin-left: 11px;"></i>
+                        </a>
+                    </div>
+
+                    <div class="col-sm-2 w3-right" id="ddlpagination">
+                        <select class="form-control CurentPage" data-val="true" data-val-number="The field CurentPage must be a number." data-val-required="The CurentPage field is required." id="ddlPageNo" name="CurentPage" onchange="javascript:GetData(this.value);"><option selected="selected" value="1">Page No. 1</option>
+</select>
+                    </div>
+                </div>
+                <div class="table-responsive" id="printpage">
+                    <center style="display:none;" id="hdnheading">
+                        <span style="color: #2494d4;font-size: 19px;font-weight: 700;">Jal Jeevan Mission</span>
+                        <br /><font size=4>Water Quality Management Information System</font>
+                        <font size=3>
+                            <br>Department of Drinking Water & Sanitation, Ministry of Jal Shakti (GOI)
+                        </font>
+                        <br /><br />
+                        
+                    </center>
+
+                    <div class="box-body " id="printpage">
+                        <div class="SelectedParameter">
+                            <center>
+                                <b>Format L2. List of samples where samples  with found contaminated (2025-2026)</b>
+                            </center>
+                        </div>
+                        <br />
+
+                        <table class="table" style="font-size: 13px;">
+                            <thead>
+                                <tr style="text-align: center;">
+                                    <th style="width: 3%;">S.No.</th>
+                                    <th style="width: 7%;text-align: center;" class="headName">State  (2025-2026)</th>
+                                    <th style="width: 7%;text-align: center;" class="headName">District</th>
+                                    <th style="width: 7%;text-align: center;" class="headName">Block</th>
+                                    <th style="width: 7%;text-align: center;" class="headName">Gram panchayat</th>
+                                    <th style="width: 7%;text-align: center;" class="headName">Village</th>
+                                    <th style="width: 10%;text-align: center;" class="headName">Sample source</th>
+                                    <th style="width: 9%;text-align: center;" class="headName">Sample Id</th>
+                                    <th style="width: 9%;text-align: center;" class="headName">Lab name</th>
+                                    <th style="width: 9%;text-align: center;" class="headName">Sample Collection date</th>
+                                    <th style="width: 9%;text-align: center;" class="headName">Sample tested date</th>
+                                    <th style="width: 9%;text-align: center;" class="headName">Sample Status</th>
+                                    <th style="width: 11%;text-align: center;" class="headName">Contaminated parameters</th>
+
+                                        <th style="width: 11%;text-align: center;" class="headName">Chemical parameters</th>
+                                        <th style="width: 11%;text-align: center;" class="headName">Bacteriologial parameters</th>
+
+
+
+                                </tr>
+                            </thead>
+                            <tbody class="tbllabtestingsample">
+                                        <tr>
+                                            <td>1</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Sulikeri</td>
+                                            <td class="txtcontent">Sulikeri</td>
+                                            <td class="txtcontent">School name : GOVT- HIGHER  PRIMARY SCHOOL SULIKERI</td>
+                                            <td class="txtcontent">U1359972S30227313</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">23/06/2025</td>
+                                            <td class="txtcontent">24/06/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Nitrate (as NO3) (mg/l) : 100.860</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 3.000, Turbidity (NTU) : 0.200, pH (NA) : 7.480, TDS (mg/l) : 1378.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 268.000, Chloride (as Cl) (mg/l) : 254.110, Fluoride (as F) (mg/l) : 0.990, Nitrate (as NO3) (mg/l) : 100.860, Sulphate (as SO4) (mg/l) : 105.540, Calcium (as Ca) (mg/l) : 97.690, Magnesium (As Mg) (mg/l) : 58.370, Total Hardness (As CaCO3) (mg/l) : 484.440, Iron (As Fe) (mg/l) : 0.130, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 1993.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Fakir-budhihal</td>
+                                            <td class="txtcontent">Narenur</td>
+                                            <td class="txtcontent">Individual house tap water   Location : village limit  [ Source type : Deep Tubewell ]  [ schemeId : 7533255, scheme name : Providing Pipeline and house hold connectio   to Narenur scp badami taluk, Type : PWS ]</td>
+                                            <td class="txtcontent">U1359972S34984984</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">22/01/2026</td>
+                                            <td class="txtcontent">23/01/2026</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Fluoride (as F) (mg/l) : 1.750</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 1.000, Turbidity (NTU) : 0.300, pH (NA) : 7.680, TDS (mg/l) : 1215.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 289.100, Chloride (as Cl) (mg/l) : 309.180, Fluoride (as F) (mg/l) : 1.750, Nitrate (as NO3) (mg/l) : 22.530, Sulphate (as SO4) (mg/l) : 165.800, Calcium (as Ca) (mg/l) : 117.710, Magnesium (As Mg) (mg/l) : 56.250, Total Hardness (As CaCO3) (mg/l) : 525.750, Iron (As Fe) (mg/l) : 0.180, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 1960.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Hullikeri</td>
+                                            <td class="txtcontent">GUBBERAKOPPA</td>
+                                            <td class="txtcontent">Public tap water location : -----</td>
+                                            <td class="txtcontent">U1359972S29213665</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">16/05/2025</td>
+                                            <td class="txtcontent">17/05/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Fluoride (as F) (mg/l) : 1.880</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 5.000, Turbidity (NTU) : 0.100, pH (NA) : 7.970, TDS (mg/l) : 1482.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 344.400, Chloride (as Cl) (mg/l) : 262.020, Fluoride (as F) (mg/l) : 1.880, Nitrate (as NO3) (mg/l) : 30.120, Sulphate (as SO4) (mg/l) : 122.610, Calcium (as Ca) (mg/l) : 107.790, Magnesium (As Mg) (mg/l) : 67.430, Total Hardness (As CaCO3) (mg/l) : 546.960, Iron (As Fe) (mg/l) : 0.160, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 2012.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Kainakatti</td>
+                                            <td class="txtcontent">Sheeparamatti</td>
+                                            <td class="txtcontent">Individual house tap water   Location : In Village Limit  [ Source type : Deep Tubewell ]  [ schemeId : 8155164, scheme name : Drilling of Borewll in Shiparamatti village (CAP1 Bilgi), Type : Augmentation ]</td>
+                                            <td class="txtcontent">U1359972S30117289</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">19/06/2025</td>
+                                            <td class="txtcontent">20/06/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Nitrate (as NO3) (mg/l) : 61.370, Fluoride (as F) (mg/l) : 1.930</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 2.000, Turbidity (NTU) : 0.100, pH (NA) : 7.800, TDS (mg/l) : 1502.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 296.000, Chloride (as Cl) (mg/l) : 287.850, Fluoride (as F) (mg/l) : 1.930, Nitrate (as NO3) (mg/l) : 61.370, Sulphate (as SO4) (mg/l) : 139.270, Calcium (as Ca) (mg/l) : 97.690, Magnesium (As Mg) (mg/l) : 2.260, Total Hardness (As CaCO3) (mg/l) : 500.450, Iron (As Fe) (mg/l) : 0.170, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 2240.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Kainakatti</td>
+                                            <td class="txtcontent">Sheeparamatti</td>
+                                            <td class="txtcontent">Individual house tap water   Location : Near Beerappa&#39;s house  [ Source type : Deep Tubewell ]  [ schemeId : 5713559, scheme name : w/s to anganavadi shiperamatti, Type : PWS ]</td>
+                                            <td class="txtcontent">U1359972S30117295</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">19/06/2025</td>
+                                            <td class="txtcontent">26/06/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Nitrate (as NO3) (mg/l) : 50.520</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 1.000, Turbidity (NTU) : 0.100, pH (NA) : 7.240, TDS (mg/l) : 1424.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 316.000, Chloride (as Cl) (mg/l) : 266.020, Fluoride (as F) (mg/l) : 1.130, Nitrate (as NO3) (mg/l) : 50.520, Sulphate (as SO4) (mg/l) : 117.950, Calcium (as Ca) (mg/l) : 108.900, Magnesium (As Mg) (mg/l) : 71.020, Total Hardness (As CaCO3) (mg/l) : 564.210, Iron (As Fe) (mg/l) : 0.100, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 2014.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>6</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Kataraki</td>
+                                            <td class="txtcontent">Katharaki</td>
+                                            <td class="txtcontent">Source Type : Deep Tubewell, location : In Village Limit</td>
+                                            <td class="txtcontent">U1359972S28400949</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">08/04/2025</td>
+                                            <td class="txtcontent">09/04/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Fluoride (as F) (mg/l) : 1.770</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 2.000, Turbidity (NTU) : 0.400, pH (NA) : 8.040, TDS (mg/l) : 1498.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 276.000, Chloride (as Cl) (mg/l) : 250.320, Fluoride (as F) (mg/l) : 1.770, Nitrate (as NO3) (mg/l) : 21.770, Sulphate (as SO4) (mg/l) : 142.690, Calcium (as Ca) (mg/l) : 97.690, Magnesium (As Mg) (mg/l) : 56.430, Total Hardness (As CaCO3) (mg/l) : 476.430, Iron (As Fe) (mg/l) : 0.100, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 2250.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>7</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Hullikeri</td>
+                                            <td class="txtcontent">MATTIKATTI</td>
+                                            <td class="txtcontent">Source Type : Deep Tubewell, location : Near sadguru matha</td>
+                                            <td class="txtcontent">U1359972S29068253</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">15/05/2025</td>
+                                            <td class="txtcontent">16/05/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Fluoride (as F) (mg/l) : 2.060</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 2.000, Turbidity (NTU) : 0.200, pH (NA) : 8.140, TDS (mg/l) : 780.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 176.400, Chloride (as Cl) (mg/l) : 194.530, Fluoride (as F) (mg/l) : 2.060, Nitrate (as NO3) (mg/l) : 18.290, Sulphate (as SO4) (mg/l) : 61.830, Calcium (as Ca) (mg/l) : 74.500, Magnesium (As Mg) (mg/l) : 51.050, Total Hardness (As CaCO3) (mg/l) : 396.350, Iron (As Fe) (mg/l) : 0.070, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 1219.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>8</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Belur</td>
+                                            <td class="txtcontent">Belur</td>
+                                            <td class="txtcontent">Public tap water location : -----</td>
+                                            <td class="txtcontent">U1359972S29068265</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">15/05/2025</td>
+                                            <td class="txtcontent">16/05/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Turbidity (NTU) : 7.800, pH (NA) : 8.870</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 10.000, Turbidity (NTU) : 7.800, pH (NA) : 8.870, TDS (mg/l) : 704.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 294.000, Chloride (as Cl) (mg/l) : 194.530, Fluoride (as F) (mg/l) : 0.370, Nitrate (as NO3) (mg/l) : 4.430, Sulphate (as SO4) (mg/l) : 63.350, Calcium (as Ca) (mg/l) : 50.730, Magnesium (As Mg) (mg/l) : 33.710, Total Hardness (As CaCO3) (mg/l) : 265.550, Iron (As Fe) (mg/l) : 0.010, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 1094.000</td>
+                                                <td class="txtcontent"></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>9</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Nandikeshwar</td>
+                                            <td class="txtcontent">Nandikeshwar</td>
+                                            <td class="txtcontent">Individual house tap water   Location : Towards minin kere road  [ Source type : Deep Tubewell ]  [ schemeId : 8200120, scheme name : Providing Pipeline and Tap Connection to Anganwadi Centres of Nandikeshwar Village in Nandikeshwar GP in Badami Taluka, Type : retrofit ]</td>
+                                            <td class="txtcontent">U1359972S28906289</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">07/05/2025</td>
+                                            <td class="txtcontent">08/05/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Fluoride (as F) (mg/l) : 1.800</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 2.000, Turbidity (NTU) : 0.000, pH (NA) : 8.010, TDS (mg/l) : 1420.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 331.800, Chloride (as Cl) (mg/l) : 250.110, Fluoride (as F) (mg/l) : 1.800, Nitrate (as NO3) (mg/l) : 20.590, Sulphate (as SO4) (mg/l) : 49.000, Calcium (as Ca) (mg/l) : 106.210, Magnesium (As Mg) (mg/l) : 70.320, Total Hardness (As CaCO3) (mg/l) : 554.890, Iron (As Fe) (mg/l) : 0.100, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 1894.000</td>
+                                                <td class="txtcontent"></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>10</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">ANAWAL</td>
+                                            <td class="txtcontent">Kalabandakeri</td>
+                                            <td class="txtcontent">Public tap water location : -----</td>
+                                            <td class="txtcontent">U1359972S31090385</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">02/08/2025</td>
+                                            <td class="txtcontent">04/08/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Fluoride (as F) (mg/l) : 1.720</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 1.000, Turbidity (NTU) : 0.300, pH (NA) : 7.860, TDS (mg/l) : 1320.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 316.000, Chloride (as Cl) (mg/l) : 242.190, Fluoride (as F) (mg/l) : 1.720, Nitrate (as NO3) (mg/l) : 16.120, Sulphate (as SO4) (mg/l) : 131.850, Calcium (as Ca) (mg/l) : 107.810, Magnesium (As Mg) (mg/l) : 66.450, Total Hardness (As CaCO3) (mg/l) : 543.010, Iron (As Fe) (mg/l) : 0.180, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 2047.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>11</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">ANAWAL</td>
+                                            <td class="txtcontent">Kalabandakeri</td>
+                                            <td class="txtcontent">Public tap water location : -----</td>
+                                            <td class="txtcontent">U1359972S31090393</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">02/08/2025</td>
+                                            <td class="txtcontent">04/08/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Total Hardness (As CaCO3) (mg/l) : 661.910</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 1.000, Turbidity (NTU) : 0.500, pH (NA) : 8.110, TDS (mg/l) : 1412.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 284.000, Chloride (as Cl) (mg/l) : 293.810, Fluoride (as F) (mg/l) : 1.470, Nitrate (as NO3) (mg/l) : 13.440, Sulphate (as SO4) (mg/l) : 127.470, Calcium (as Ca) (mg/l) : 130.000, Magnesium (As Mg) (mg/l) : 81.870, Total Hardness (As CaCO3) (mg/l) : 661.910, Iron (As Fe) (mg/l) : 0.230, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 2102.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>12</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Neeralkeri</td>
+                                            <td class="txtcontent">Neeralakeri</td>
+                                            <td class="txtcontent">School name : GOVT- HIGHER PRIMARY SCHOOL NEERALKERI</td>
+                                            <td class="txtcontent">U1359972S31090595</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">05/08/2025</td>
+                                            <td class="txtcontent">06/08/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Fluoride (as F) (mg/l) : 1.780</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 2.000, Turbidity (NTU) : 0.200, pH (NA) : 7.440, TDS (mg/l) : 1206.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 260.000, Chloride (as Cl) (mg/l) : 224.330, Fluoride (as F) (mg/l) : 1.780, Nitrate (as NO3) (mg/l) : 14.600, Sulphate (as SO4) (mg/l) : 110.150, Calcium (as Ca) (mg/l) : 82.440, Magnesium (As Mg) (mg/l) : 51.050, Total Hardness (As CaCO3) (mg/l) : 416.170, Iron (As Fe) (mg/l) : 0.160, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 1549.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>13</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Cholachagud</td>
+                                            <td class="txtcontent">Cholachagudda</td>
+                                            <td class="txtcontent">Individual house tap water   Location : Near OHT Banashankari   [ Source type : Deep Tubewell ]  [ schemeId : 7564208, scheme name : Augmentation of PWS scheme to Banashankari village badami taluk, Type : Augmentation ]</td>
+                                            <td class="txtcontent">U1359972S34020551</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">22/12/2025</td>
+                                            <td class="txtcontent">23/12/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Turbidity (NTU) : 10.200</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 10.000, Turbidity (NTU) : 10.200, pH (NA) : 7.380, TDS (mg/l) : 300.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 134.330, Chloride (as Cl) (mg/l) : 67.500, Fluoride (as F) (mg/l) : 0.480, Nitrate (as NO3) (mg/l) : 10.190, Sulphate (as SO4) (mg/l) : 29.630, Calcium (as Ca) (mg/l) : 33.290, Magnesium (As Mg) (mg/l) : 18.300, Total Hardness (As CaCO3) (mg/l) : 158.540, Iron (As Fe) (mg/l) : 0.250, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 484.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>14</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Cholachagud</td>
+                                            <td class="txtcontent">Cholachagudda</td>
+                                            <td class="txtcontent">Individual house tap water   Location : Near Govt school Cholachagudda   [ Source type : Deep Tubewell ]  [ schemeId : 4879955, scheme name : ws to school cholachagudda asare colony, Type : PWS ]</td>
+                                            <td class="txtcontent">U1359972S34020754</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">22/12/2025</td>
+                                            <td class="txtcontent">23/12/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Total Hardness (As CaCO3) (mg/l) : 665.870</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 1.000, Turbidity (NTU) : 0.000, pH (NA) : 7.780, TDS (mg/l) : 1748.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 452.730, Chloride (as Cl) (mg/l) : 424.830, Fluoride (as F) (mg/l) : 0.430, Nitrate (as NO3) (mg/l) : 24.270, Sulphate (as SO4) (mg/l) : 123.710, Calcium (as Ca) (mg/l) : 133.170, Magnesium (As Mg) (mg/l) : 80.900, Total Hardness (As CaCO3) (mg/l) : 665.870, Iron (As Fe) (mg/l) : 0.130, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 2820.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>15</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Cholachagud</td>
+                                            <td class="txtcontent">Cholachagudda</td>
+                                            <td class="txtcontent">Individual house tap water   Location : village limit  [ Source type : Deep Tubewell ]  [ schemeId : 435817, scheme name : Cholachagudd, Type : PWS ]</td>
+                                            <td class="txtcontent">U1359972S34020957</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">22/12/2025</td>
+                                            <td class="txtcontent">23/12/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Total Hardness (As CaCO3) (mg/l) : 630.200</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 1.000, Turbidity (NTU) : 0.000, pH (NA) : 7.700, TDS (mg/l) : 1587.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 407.950, Chloride (as Cl) (mg/l) : 416.890, Fluoride (as F) (mg/l) : 0.450, Nitrate (as NO3) (mg/l) : 35.420, Sulphate (as SO4) (mg/l) : 111.400, Calcium (as Ca) (mg/l) : 122.080, Magnesium (As Mg) (mg/l) : 78.980, Total Hardness (As CaCO3) (mg/l) : 630.200, Iron (As Fe) (mg/l) : 0.270, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 2560.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>16</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Mangalore</td>
+                                            <td class="txtcontent">Hirenasabi</td>
+                                            <td class="txtcontent">Public tap water location : -----</td>
+                                            <td class="txtcontent">U1359972S31546383</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">26/08/2025</td>
+                                            <td class="txtcontent">28/08/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Turbidity (NTU) : 10.500, pH (NA) : 8.780</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 1.000, Turbidity (NTU) : 10.500, pH (NA) : 8.780, TDS (mg/l) : 240.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 144.000, Chloride (as Cl) (mg/l) : 59.560, Fluoride (as F) (mg/l) : 0.070, Nitrate (as NO3) (mg/l) : 1.930, Sulphate (as SO4) (mg/l) : 16.970, Calcium (as Ca) (mg/l) : 23.780, Magnesium (As Mg) (mg/l) : 16.370, Total Hardness (As CaCO3) (mg/l) : 126.830, Iron (As Fe) (mg/l) : 0.030, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 362.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>17</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Fakir-budhihal</td>
+                                            <td class="txtcontent">Fakeerabudihal</td>
+                                            <td class="txtcontent">Individual house tap water   Location : Forest area  [ Source type : Deep Tubewell ]  [ schemeId : 4877349, scheme name : ws to anganwadi fhakirbudihal, Type : PWS ]</td>
+                                            <td class="txtcontent">U1359972S28739948</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">28/04/2025</td>
+                                            <td class="txtcontent">29/04/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Turbidity (NTU) : 6.800</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 10.000, Turbidity (NTU) : 6.800, pH (NA) : 7.510, TDS (mg/l) : 740.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 136.000, Chloride (as Cl) (mg/l) : 145.850, Fluoride (as F) (mg/l) : 0.310, Nitrate (as NO3) (mg/l) : 7.010, Sulphate (as SO4) (mg/l) : 108.680, Calcium (as Ca) (mg/l) : 44.840, Magnesium (As Mg) (mg/l) : 32.100, Total Hardness (As CaCO3) (mg/l) : 244.220, Iron (As Fe) (mg/l) : 0.100, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 1017.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>18</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Mutalgeri</td>
+                                            <td class="txtcontent">Muttalageri</td>
+                                            <td class="txtcontent">Public tap water location : -----</td>
+                                            <td class="txtcontent">U1359972S30496461</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">27/06/2025</td>
+                                            <td class="txtcontent">30/06/2025</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Nitrate (as NO3) (mg/l) : 70.030</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 2.000, Turbidity (NTU) : 0.200, pH (NA) : 7.390, TDS (mg/l) : 1580.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 324.000, Chloride (as Cl) (mg/l) : 269.990, Fluoride (as F) (mg/l) : 0.840, Nitrate (as NO3) (mg/l) : 70.030, Sulphate (as SO4) (mg/l) : 151.760, Calcium (as Ca) (mg/l) : 115.300, Magnesium (As Mg) (mg/l) : 73.940, Total Hardness (As CaCO3) (mg/l) : 592.530, Iron (As Fe) (mg/l) : 0.240, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 2320.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 0.000, Total coliform (CFU/ 100 ml) : 0.000</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>19</td>
+                                            <td class="txtcontent">Karnataka</td>
+                                            <td class="txtcontent">Bagalkote</td>
+                                            <td class="txtcontent">Badami</td>
+                                            <td class="txtcontent">Mamtageri</td>
+                                            <td class="txtcontent">KALLAPUR.S.K</td>
+                                            <td class="txtcontent">Individual house tap water   Location : Kallapur SK pond area  [ Source type : Deep Tubewell ]  [ schemeId : 5708323, scheme name : Providing  water supply to Anganawadi Kallapur SK, Type : PWS ]</td>
+                                            <td class="txtcontent">U1359972S35124026</td>
+                                            <td class="txtcontent">RDW&amp;SD Water Quality Testing Lab Bagalakote</td>
+                                            <td class="txtcontent">27/02/2026</td>
+                                            <td class="txtcontent">28/02/2026</td>
+
+                                            <td class="txtcontent">Tested in lab</td>
+                                            <td class="txtcontent"> Total Hardness (As CaCO3) (mg/l) : 672.600, E. coli (CFU/100 ml) : 5.000, Total coliform (CFU/ 100 ml) : 5.000</td>
+
+                                                <td class="txtcontent"> Colour (Hazen units) : 1.000, Turbidity (NTU) : 0.400, pH (NA) : 7.460, TDS (mg/l) : 1160.000, Total Alkalinity (as Calcium Carbonate) (mg/l) : 333.330, Chloride (as Cl) (mg/l) : 272.000, Fluoride (as F) (mg/l) : 1.260, Nitrate (as NO3) (mg/l) : 34.780, Sulphate (as SO4) (mg/l) : 117.060, Calcium (as Ca) (mg/l) : 136.120, Magnesium (As Mg) (mg/l) : 80.750, Total Hardness (As CaCO3) (mg/l) : 672.600, Iron (As Fe) (mg/l) : 0.120, Conductivity (micromhos per centimeter / microsiemens per centimeter) : 1842.000</td>
+                                                <td class="txtcontent"> E. coli (CFU/100 ml) : 5.000, Total coliform (CFU/ 100 ml) : 5.000</td>
+
+                                        </tr>
+                            </tbody>
+                        </table>
+                        <table style="border:collapse collapse;display:none;width:100%" id="hdnfooter">
+                            <tr>
+                            <tr><td align=left class=ReportFooter><i>Source: https://ejalshakti.gov.in </i> </td><td align=right class=ReportFooter></td></tr>
+                            <tr><td>&nbsp;</td><td class=ReportFooter align=right>Report Printed On 10/23/2026 12:48:50 PM</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+</div>
+<script src="/WQMIS/Content/Print.js"></script>
+<script src="/WQMIS/Scripts/enc-base64-min.js"></script>
+<script src="/WQMIS/Scripts/aes.js"></script>
+<script>
+    $(document).ready(function () {
+         
+        if (1 == 1) {
+            $("#ddlpagination").hide();
+            $("#execel").hide();
+        }
+        else {
+            $("#ddlpagination").show();
+            $("#execel").show();
+        }
+     });
+
+
+
+    function GetData(_Id) {
+
+        var _st = 15;
+        var _dt = 187;
+        var _bl = 2481;
+        var _gp = 0;
+        var _vil = 0;
+        var _fy = "2025-2026";
+        var _custa = "8";
+        var _cpage = _Id;
+        var url = "../Report/labtestingsamplelist_fil/";
+        var ulplan = "";
+        $(".tbllabtestingsample").html('');
+        $.ajax({
+            url: url,
+            data: {
+                cpage: enCriptedAES(_cpage),
+                currentstatus: enCriptedAES(_custa),
+                stid: enCriptedAES(_st),
+                dtid: enCriptedAES(_dt),
+                blid: enCriptedAES(_bl),
+                gpid: enCriptedAES(_gp),
+                villid: enCriptedAES(_vil),
+                fy: enCriptedAES(_fy)
+            },
+            cache: false,
+            type: "POST",
+            success: function (data) {
+
+                if (data.Labtestingdata.length > 0) {
+                    for (var x = 0; x < data.Labtestingdata.length; x++) {
+                        ulplan += "<tr>";
+                        ulplan += "<td>" + data.Labtestingdata[x].RowNo + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].State + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].District + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].Block + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].Grampanchayat + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].Village + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].sample_sourceName + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].SampleId + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].labname + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].sample_collection_time + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].s_report_approval_action_time + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].Status + "</td>";
+                        ulplan += "<td>" + data.Labtestingdata[x].Contaminated_parameters + "</td>";
+
+                        if (data.currentstatus == '14') {
+                            ulplan += "<td>" + data.Labtestingdata[x].chemical_parameter + "</td>";
+                        } else if (data.currentstatus == '15') {
+                            ulplan += "<td>" + data.Labtestingdata[x].bact_parameter + "</td>";
+                        }
+                        else {
+                            ulplan += "<td>" + data.Labtestingdata[x].chemical_parameter + "</td>";
+                            ulplan += "<td>" + data.Labtestingdata[x].bact_parameter + "</td>";
+                        }
+
+
+                        /* ulplan += "<td>" + data.Labtestingdata[x].s_report_approval_action_time + "</td>";*/
+                        
+                        if (data.currentstatus == '11') {
+                            ulplan += "<td>" + data.Labtestingdata[x].Remedial_chem_remarks + "</td>";
+                            ulplan += "<td>" + data.Labtestingdata[x].Remedial_bact_remarks + "</td>";
+                        } else if (data.currentstatus == '12') {
+                            ulplan += "<td>" + data.Labtestingdata[x].Remedial_chem_remarks + "</td>";
+                            ulplan += "<td>" + data.Labtestingdata[x].Remedial_bact_remarks + "</td>";
+                        } else if (data.currentstatus == '13') {
+                            ulplan += "<td>" + data.Labtestingdata[x].Remedial_chem_remarks + "</td>";
+                            ulplan += "<td>" + data.Labtestingdata[x].Remedial_bact_remarks + "</td>";
+                        }
+
+                        ulplan += "</tr>"
+                    }
+                }
+                else {
+                    ulplan += "<tr><td colspan='8' style='text-align: right;color: red'>No records available</td></tr>";
+                }
+                $(".tbllabtestingsample").append(ulplan);
+                
+                if (data.TotalPage > 1) {
+                    $("#ddlpagination").show();
+                    GetddlPag(data.TotalPage, data.CurentPage);
+                }
+                else {
+                    $("#ddlpagination").hide();
+                }
+            },
+        });
+    }
+
+    function GetddlPag(_TotalPage, CurentPage) {
+        
+        var url = "../Report/GetddlPaging/";
+        $.ajax({
+            url: url,
+            data: { TotPage: _TotalPage },
+            cache: false,
+            type: "POST",
+            async: false,
+            success: function (data) {
+                if (data.length > 0) {
+                    var markup = '';
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].PageNo + ">" + data[x].PageNotitle + "</option>";
+                    }
+                    $("#ddlPageNo").html(markup).show();
+                    $(".CurentPage").val(CurentPage);
+                }
+                else {
+                    $("#ddlPageNo").empty();
+                }
+            },
+
+        });
+    }
+
+
+
+</script>
+            
+        </div>
+
+        <footer class="main-footer">
+            <h4 id="spndatetime" class="spndatetime" hidden="hidden" style="text-align:right;">10/23/2026 12:48:50 PM</h4>
+            <div class="pull-right hidden-xs">
+                You will be logged out for inactivity.
+            </div>
+            <strong>Designed & developed by  <a href="#">NIC </a>.</strong> Copyright © NJJM 2020
+        </footer>
+        <div class="control-sidebar-bg"></div>
+
+    </div>
+
+</body>
+
+</html>

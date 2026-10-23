@@ -1,0 +1,81 @@
+/* Desktop: map-dominant, a fixed 420 px reading column on the left. Below the fold: full-width sections. */
+
+.sim-band, .notice-band {
+  position: sticky; top: 0; z-index: 30;
+  margin: 0; padding: 8px var(--gutter);
+  font: 500 var(--t16)/1.4 var(--font-ui);
+}
+.sim-band { background: var(--sim); color: var(--sim-ink); height: var(--sim-h); overflow: hidden; display: flex; align-items: center; }
+@media (max-width: 899px) { .sim-band { font-size: var(--t14); line-height: 1.4; } }
+.notice-band { background: var(--survey); color: var(--on-survey); display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.notice-band button {
+  border: 1px solid currentColor; background: transparent; color: inherit; border-radius: var(--r-pill);
+  padding: 2px 12px; font: 500 var(--t14)/1.4 var(--font-ui); cursor: pointer;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: var(--panel-w) 1fr;
+  height: calc(100vh - var(--band-h));
+  height: calc(100dvh - var(--band-h));
+}
+
+.map-wrap { grid-column: 2; grid-row: 1; position: relative; min-height: 0; }
+.map-wrap > .map { position: absolute; inset: 0; } /* beats .maplibregl-map { position: relative } */
+.map-fallback {
+  position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center;
+  font: 400 var(--t16)/1.4 var(--font-ui); color: var(--ink-soft);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 39px, var(--rule-soft) 39px 40px),
+    repeating-linear-gradient(90deg, transparent 0 39px, var(--rule-soft) 39px 40px);
+}
+.map-ready .map-fallback { display: none; }
+
+.sheet { display: contents; }
+.sheet-handle { display: none; }
+.sheet-scroll {
+  grid-column: 1; grid-row: 1; min-height: 0;
+  overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-gutter: stable;
+  border-right: 1px solid var(--rule);
+}
+.panel { padding: 0 var(--gutter) 48px; }
+
+.below {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 80px;
+  padding: 80px var(--gutter) 48px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+/* Phones and narrow tablets: map on top (55vh), content in a draggable bottom sheet with three snap points. */
+@media (max-width: 899px) {
+  :root { --gutter: 16px; }
+  body { overflow: hidden; overscroll-behavior: none; }
+  .layout { display: block; height: auto; }
+  /* The map fills the screen behind the sheet; camera padding keeps its centre in the visible part. */
+  .map-wrap { position: fixed; left: 0; right: 0; top: var(--band-h); bottom: 0; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    top: calc(var(--band-h) + 8px);
+    display: flex; flex-direction: column;
+    transform: translateY(var(--sheet-y, 50vh));
+    background: var(--page);
+    box-shadow: var(--shadow-sheet);   /* the one drop shadow on the site: the floating panel over the map */
+    transition: transform 280ms cubic-bezier(.2, .7, .2, 1);
+  }
+  .sheet.dragging { transition: none; }
+  .sheet-handle {
+    display: grid; place-items: center; flex: none;
+    width: 100%; height: 30px; padding: 0; border: 0; background: transparent; cursor: grab;
+    touch-action: none;
+  }
+  .sheet-handle span { width: 44px; height: 4px; border-radius: var(--r-pill); background: var(--ink-soft); opacity: .6; }
+  .sheet-scroll {
+    flex: 1; border-right: 0;
+    padding-bottom: var(--sheet-y, 50vh); /* keeps the end of the content reachable at every snap point */
+  }
+  .panel { padding-bottom: 16px; }
+  .below { padding: 40px var(--gutter) 24px; gap: 56px; }
+}

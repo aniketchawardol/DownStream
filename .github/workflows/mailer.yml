@@ -1,0 +1,23 @@
+# Runs services/worker/jobs/mailer.js once. Job logic is shared with the local Docker worker.
+name: mailer
+on:
+  schedule: [{ cron: '*/5 * * * *' }]   # every 5 minutes, GitHub's minimum (cron is UTC)
+  workflow_dispatch: {}
+concurrency: { group: mail, cancel-in-progress: false }
+permissions: { contents: read }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci --omit=dev
+      - run: node services/worker/run-once.js mailer
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SMTP_URL: ${{ secrets.SMTP_URL }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          PUBLIC_BASE_URL: ${{ secrets.PUBLIC_BASE_URL }}
