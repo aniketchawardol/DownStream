@@ -12,6 +12,7 @@ import { WqmisClient } from '../lib/wqmis.js';
 import { runSource } from '../lib/source.js';
 import { gpsInScope } from '../lib/areas.js';
 import { evaluateTapAlerts } from './tap-alerts.js';
+import { outOfTime } from '../lib/deadline.js';
 import { oneShot } from '../lib/one-shot.js';
 
 const log = logger('wqmis-samples');
@@ -116,12 +117,13 @@ export async function samplesCycle(sql, opts = {}) {
   const byBlock = new Map();
   for (const g of gps) { const k = String(g.block_area_id); if (!byBlock.has(k)) byBlock.set(k, []); /** @type {any[]} */ (byBlock.get(k)).push(g); }
 
-  let inserted = 0, fetched = 0, skipped = 0;
+  let inserted = 0, fetched = 0, skipped = 0, stoppedEarly = false;
   /** @type {string[]} */
   const warnings = [];
-  for (const blockGps of byBlock.values()) {
+  blocks: for (const blockGps of byBlock.values()) {
     const first = blockGps[0];
     for (const f of fys) {
+      if (outOfTime()) { stoppedEarly = true; break blocks; }
       const due = f === fy || prevAlways ? blockGps : blockGps.filter((g) => isBaseline(g, f));
       if (!due.length) continue;
       /** @type {Map<string, number>} */
@@ -133,6 +135,8 @@ export async function samplesCycle(sql, opts = {}) {
         warnings.push(`counts for block ${first.block_name} ${f}: ${/** @type {Error} */ (err).message}`);
       }
       for (const gp of due) {
+        // Out of time: stop cleanly. GPs not yet read keep no count for this FY, so the next run picks them up.
+        if (outOfTime()) { stoppedEarly = true; break blocks; }
         const tested = counts.get(String(gp.jjm_id));
         const prev = gp.tested_counts?.[f];
         if (tested != null && (tested === prev || (tested === 0 && prev == null))) {
@@ -159,15 +163,16 @@ export async function samplesCycle(sql, opts = {}) {
     }
     log.info('block done', { block: first.block_name, inserted_so_far: inserted });
   }
-  if (gps.length && fetched === 0 && skipped === 0) throw new Error(`no panchayat could be read (${warnings[0] ?? 'unknown error'})`);
+  if (!stoppedEarly && gps.length && fetched === 0 && skipped === 0) throw new Error(`no panchayat could be read (${warnings[0] ?? 'unknown error'})`);
 
-  const reports = await fetchReports(sql, client, opts.reportBudget ?? 300);
+  if (stoppedEarly) log.warn('time budget spent; the next run continues the crawl', { gps_fetched: fetched });
+  const reports = stoppedEarly ? { ok: 0, failed: 0, skipped: 'out of time' } : await fetchReports(sql, client, opts.reportBudget ?? 300);
   const alerts = await evaluateTapAlerts(sql, now);
   const [{ newest }] = await sql`select max(analysed_at) as newest from wq_sample`;
   return {
     records: inserted,
     newest_data_at: newest,
-    notes: { fys, gps: gps.length, gps_fetched: fetched, gps_unchanged: skipped, reports, alerts_created: alerts.created, ...(warnings.length ? { warnings: warnings.slice(0, 20) } : {}) },
+    notes: { fys, complete: !stoppedEarly, gps: gps.length, gps_fetched: fetched, gps_unchanged: skipped, reports, alerts_created: alerts.created, ...(warnings.length ? { warnings: warnings.slice(0, 20) } : {}) },
   };
 }
 
@@ -183,6 +188,7 @@ export async function fetchReports(sql, client, budget) {
     limit ${budget}`;
   let ok = 0, failed = 0;
   for (const { sample_id } of todo) {
+    if (outOfTime()) break;
     const digits = sample_id.split('S').pop();
     try {
       const parsed = parseReport(await client.report(digits));

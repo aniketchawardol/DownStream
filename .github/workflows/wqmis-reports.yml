@@ -8,7 +8,7 @@ permissions: { contents: read }
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,6 +17,7 @@ jobs:
       - run: node services/worker/run-once.js wqmis-reports
         env:
           NODE_ENV: production
+          JOB_TIME_BUDGET_MIN: '22'   # stop starting new work after this, so the run ends before the timeout and the next one continues
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
           WQMIS_STATES: ${{ secrets.WQMIS_STATES }}

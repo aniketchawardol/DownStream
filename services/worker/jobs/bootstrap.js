@@ -2,7 +2,7 @@
 // Fill an empty or stale database without waiting for each job's own slot: the same checks the local worker
 // makes at startup, run once. Safe to repeat; each step is skipped when its source succeeded recently.
 import { logger } from '@lt/core/log.js';
-import { istDate } from '@lt/core/time.js';
+import { istDate, fiscalYear } from '@lt/core/time.js';
 import { oneShot } from '../lib/one-shot.js';
 import { cpcbJob } from './cpcb.js';
 import { hierarchyJob } from './wqmis-hierarchy.js';
@@ -25,7 +25,14 @@ export async function bootstrapCycle(sql) {
   if (!(await fresh('wqmis-hierarchy', '7 days'))) ran.hierarchy = (await hierarchyJob(sql)).ok;
   const [{ ungeocoded }] = await sql`select count(*)::int as ungeocoded from wq_area where level = 'gp' and geom is null`;
   if (ungeocoded || !(await fresh('geocode', '30 days'))) ran.geocode = (await geocodeJob(sql)).ok;
-  if (!(await fresh('wqmis-samples', '1 day'))) ran.samples = (await samplesJob(sql)).ok;
+  // Samples are needed until every panchayat has been read for this FY: a crawl cut short by a time limit
+  // still counts as a recent success, so check coverage, not just the last run.
+  const [{ unread }] = await sql`select count(*)::int as unread from wq_area where level = 'gp' and not coalesce(tested_counts, '{}'::jsonb) ? ${fiscalYear()}`;
+  if (unread || !(await fresh('wqmis-samples', '1 day'))) {
+    const r = await samplesJob(sql);
+    ran.samples = r.ok;
+    if (r.ok && /** @type {any} */ (r).notes?.complete === false) ran.samples_incomplete = 'out of time: run bootstrap again to continue';
+  }
   const [{ snaps }] = await sql`select count(*)::int as snaps from wq_daily_snapshot where snapshot_date = ${istDate()}`;
   if (!snaps) ran.dashboard = (await dashboardJob(sql)).ok;
   log.info('bootstrap finished', { ran });

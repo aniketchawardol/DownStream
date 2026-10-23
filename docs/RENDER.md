@@ -78,9 +78,13 @@ Crons in the files are UTC; the comments give the IST times they correspond to.
    | `MOCK_EMAIL` | an address to pre-subscribe at the simulation point. Usually leave unset and subscribe from the site | no |
 
    The external URL is a `*.render.com` host; the jobs connect to it over TLS automatically.
-5. **Fill the database:** **Actions > "bootstrap (fill an empty database)" > Run workflow.** It takes about
-   25 minutes: CPCB with history, the WQMIS hierarchy, panchayat locations, samples, the dashboard. After
-   that the schedules keep it current. Lab reports trickle in hourly.
+5. **Fill the database:** **Actions > "bootstrap (fill an empty database)" > Run workflow.** It loads CPCB
+   with history, the WQMIS hierarchy, panchayat locations, samples and the dashboard. From GitHub's US
+   runners WQMIS is about 10× slower than from India (around 20 minutes per block, so 3–4 hours for
+   Bagalkote's 9 blocks). The run has a time budget and stops cleanly before GitHub's limit, saving its
+   place. If its log ends with `samples_incomplete`, run it again and it continues from where it
+   stopped. After that the schedules keep the data current; daily runs only re-read panchayats whose
+   test counts changed. Lab reports trickle in hourly.
 6. **Check:**
    - `https://<url>/api/health` returns 200;
    - in **Actions**, each workflow's **Run workflow** button completes green;

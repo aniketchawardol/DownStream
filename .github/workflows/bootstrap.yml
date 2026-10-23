@@ -1,13 +1,13 @@
 # Runs services/worker/jobs/bootstrap.js once. Job logic is shared with the local Docker worker.
 name: bootstrap (fill an empty database)
 on:
-  workflow_dispatch: {}   # run once after the first deploy (and any time the data looks empty)
+  workflow_dispatch: {}   # run after the first deploy; if it reports samples_incomplete, run it again to continue
 concurrency: { group: wqmis, cancel-in-progress: false }
 permissions: { contents: read }
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,6 +16,7 @@ jobs:
       - run: node services/worker/run-once.js bootstrap
         env:
           NODE_ENV: production
+          JOB_TIME_BUDGET_MIN: '320'   # stop starting new work after this, so the run ends before the timeout and the next one continues
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
           CPCB_URL: ${{ secrets.CPCB_URL }}
