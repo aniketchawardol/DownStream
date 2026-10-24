@@ -140,12 +140,12 @@ function openPath(path) {
 
 /* ---------- Pin, location, search ---------- */
 
-/** @param {number} lat @param {number} lng @param {{ fly?: boolean }} [o] */
+/** @param {number} lat @param {number} lng @param {{ fly?: boolean, zoom?: number }} [o] */
 function setPin(lat, lng, o = {}) {
   set({ pin: { lat, lng } });
   if (!mapApi) ensureMap();
   mapApi?.setPin(state.pin, state.radius);
-  if (o.fly) mapApi?.flyTo(lat, lng, 9.5);
+  if (o.fly) mapApi?.flyTo(lat, lng, o.zoom ?? 9.5);
   renderNearby(els.nearby, { lat, lng }, state.radius, (k, id) => select(k, id));
   renderPlaces(els.places, (k, id) => select(k, id));
   renderAlerts(els.alerts, openPath);
@@ -164,24 +164,50 @@ function showSearch(reason) {
   /** @type {HTMLInputElement} */ (els.searchForm.querySelector('input')).focus();
 }
 
+const outsideIndia = (/** @type {number} */ lat, /** @type {number} */ lng) => lat < 6 || lat > 37.6 || lng < 68 || lng > 97.5;
+
+/**
+ * Laptops usually have no GPS; when the browser can't place them, fall back to the internet connection's
+ * approximate location (web/src/iploc.js). @param {string} why the first half of the status sentence
+ */
+async function useIpLocation(why) {
+  els.locate.disabled = true;
+  els.locateStatus.textContent = `${why} Estimating it from your internet connection.`;
+  const { ipLocation } = await import('./iploc.js');
+  const p = await ipLocation();
+  els.locate.disabled = false;
+  if (!p) { showSearch(`${why} An estimate from your internet connection didn’t work either. Search for a place instead.`); return; }
+  if (outsideIndia(p.lat, p.lng)) { showSearch(`Your internet connection appears to be outside India (${p.city}). This site covers Indian government data only. Search for a place in India instead.`); return; }
+  set({ viewer: { lat: p.lat, lng: p.lng } });
+  setPin(p.lat, p.lng, { fly: true, zoom: 8 });
+  renderHero();
+  els.locateStatus.textContent = `${why} Using an estimate from your internet connection (via ${p.source}): near ${p.city}, ${p.region}. It can be tens of kilometres out; search above or click the map to correct it.`;
+}
+
 els.locate.addEventListener('click', () => {
-  if (!('geolocation' in navigator)) { showSearch('This browser can’t share a location. Search for a place instead.'); return; }
+  if (!('geolocation' in navigator)) { useIpLocation('This browser can’t share a location.'); return; }
   els.locate.disabled = true;
   els.locateStatus.textContent = 'Asking your browser for your location.';
   navigator.geolocation.getCurrentPosition((pos) => {
     els.locate.disabled = false;
     const { latitude: lat, longitude: lng, accuracy } = pos.coords;
-    if (lat < 6 || lat > 37.6 || lng < 68 || lng > 97.5) { showSearch('Your location is outside India. This site covers Indian government data only. Search for a place in India instead.'); return; }
+    if (outsideIndia(lat, lng)) { showSearch('Your location is outside India. This site covers Indian government data only. Search for a place in India instead.'); return; }
     set({ viewer: { lat, lng } });
-    els.locateStatus.textContent = `Using your location (accurate to about ${Math.round(accuracy)} m). It stays in this browser.`;
+    els.locateStatus.textContent = `Using your location (accurate to about ${accuracy >= 2000 ? `${Math.round(accuracy / 1000)} km` : `${Math.round(accuracy)} m`}). It stays in this browser.`;
     setPin(lat, lng, { fly: true });
     renderHero();
   }, (err) => {
     els.locate.disabled = false;
-    showSearch(err.code === err.PERMISSION_DENIED
-      ? 'Location wasn’t shared. Search for a district, block, panchayat, town or PIN code instead.'
-      : 'Your location couldn’t be found. Search for a place instead.');
-  }, { enableHighAccuracy: false, timeout: 12_000, maximumAge: 600_000 });
+    // Refusal is respected: the IP estimate is offered, never fetched behind the reader's back.
+    if (err.code === err.PERMISSION_DENIED) {
+      els.locateStatus.innerHTML = 'Location wasn’t shared. Search for a district, block, panchayat, town or PIN code instead, or <button type="button" class="btn-text" id="btn-iploc">use an approximate location from your internet connection</button>.';
+      $('#btn-iploc')?.addEventListener('click', () => useIpLocation('Location wasn’t shared.'));
+      /** @type {HTMLInputElement} */ (els.searchForm.querySelector('input')).focus();
+      return;
+    }
+    // Position unavailable or timed out: typical of a laptop with Windows or macOS location services off.
+    useIpLocation('Your browser couldn’t find this device’s location.');
+  }, { enableHighAccuracy: false, timeout: 10_000, maximumAge: 600_000 });
 });
 
 els.alertsBtn.addEventListener('click', openSubscribe);

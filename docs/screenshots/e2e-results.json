@@ -1,66 +1,76 @@
 {
-  "at": "2026-10-24T16:01:18.115Z",
+  "at": "2026-10-24T16:39:18.055Z",
   "base": "http://localhost:8080",
   "results": [
     {
       "name": "screenshots: 1440 px and 390 px, light and dark",
       "ok": true,
-      "ms": 73198
+      "ms": 70471
     },
     {
       "name": "hero sentence is live, dated and names its water",
       "ok": true,
-      "ms": 4621
+      "ms": 4682
     },
     {
       "name": "keyboard only: skip link, list, station panel, alerts pin, subscribe",
       "ok": true,
-      "ms": 6746
+      "ms": 6742
     },
     {
       "name": "keyboard only: use my location, nearby list, panchayat rulers",
       "ok": true,
-      "ms": 6284
+      "ms": 6305
     },
     {
       "name": "location refused: search for a place instead",
       "ok": true,
-      "ms": 5983
+      "ms": 5352
+    },
+    {
+      "name": "laptop: browser location unavailable -> approximate location from the internet connection",
+      "ok": true,
+      "ms": 10454
+    },
+    {
+      "name": "location refused: the IP estimate is offered, never fetched without a click",
+      "ok": true,
+      "ms": 6277
     },
     {
       "name": "testing: \"Use the simulation test point\" and a \"testing\" search both pin the simulation point",
       "ok": true,
-      "ms": 5968
+      "ms": 5357
     },
     {
       "name": "place search stays at the top centre after a pin, a selection and a scroll (desktop and phone)",
       "ok": true,
-      "ms": 12904
+      "ms": 12648
     },
     {
       "name": "map click drops a pin; radius slider redraws; form errors explain what to do",
       "ok": true,
-      "ms": 5588
+      "ms": 5553
     },
     {
       "name": "double opt-in, simulated urgent alert within a minute, one-click unsubscribe",
       "ok": true,
-      "ms": 12497
+      "ms": 21347
     },
     {
       "name": "phone: map on top, bottom sheet snaps, place selection opens the sheet",
       "ok": true,
-      "ms": 6250
+      "ms": 5710
     },
     {
       "name": "reduced motion: no pinned scroll sequence, steps shown statically",
       "ok": true,
-      "ms": 4600
+      "ms": 4793
     },
     {
       "name": "freshness ledger lists each source with fetch time, newest data and records",
       "ok": true,
-      "ms": 5383
+      "ms": 4967
     }
   ]
 }

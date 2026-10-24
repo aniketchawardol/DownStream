@@ -192,6 +192,66 @@ await check('location refused: search for a place instead', async () => {
   await ctx.close();
 });
 
+// ---------------------------------------------------------------- laptops: no browser location -> IP estimate
+/** Fake IP providers: ipapi.co answers (or fails), ipwho.is is the fallback. @param {import('playwright-core').BrowserContext} ctx @param {{ ipapiFails?: boolean }} [o] */
+async function fakeIpProviders(ctx, o = {}) {
+  /** @type {string[]} */ const hits = [];
+  await ctx.route('https://ipapi.co/**', (r) => { hits.push('ipapi.co'); return o.ipapiFails ? r.fulfill({ status: 429, body: '{"error":true,"reason":"RateLimited"}' }) : r.fulfill({ contentType: 'application/json', body: JSON.stringify({ city: 'Badami', region: 'Karnataka', country_code: 'IN', latitude: 15.9186, longitude: 75.6761 }) }); });
+  await ctx.route('https://ipwho.is/**', (r) => { hits.push('ipwho.is'); return r.fulfill({ contentType: 'application/json', body: JSON.stringify({ success: true, city: 'Bagalkot', region: 'Karnataka', country_code: 'IN', latitude: 16.1691, longitude: 75.6615 }) }); });
+  return hits;
+}
+
+await check('laptop: browser location unavailable -> approximate location from the internet connection', async () => {
+  const ctx = await browser.newContext(DESKTOP);
+  // A laptop with location services off: Chrome reports POSITION_UNAVAILABLE.
+  await ctx.addInitScript(() => {
+    Object.defineProperty(navigator, 'geolocation', { value: { getCurrentPosition: (/** @type {any} */ _ok, /** @type {any} */ fail) => setTimeout(() => fail({ code: 2, PERMISSION_DENIED: 1, POSITION_UNAVAILABLE: 2, TIMEOUT: 3, message: 'unavailable' }), 50) } });
+  });
+  const hits = await fakeIpProviders(ctx);
+  const page = await ctx.newPage();
+  await page.goto(BASE);
+  await ready(page);
+  await page.click('#btn-locate');
+  await page.waitForFunction(() => /Pin at/.test(document.querySelector('#pin-line')?.textContent || ''), null, { timeout: 15_000 });
+  const status = await page.textContent('#locate-status') || '';
+  expect(/couldn’t find this device’s location/.test(status) && /internet connection \(via ipapi\.co\): near Badami, Karnataka/.test(status), `status explains the estimate: ${status}`);
+  expect(/tens of kilometres/.test(status), 'says it can be off');
+  expect(/15\.9186, 75\.6761/.test(await page.textContent('#pin-line') || ''), 'pin at the IP estimate');
+  expect(hits.join() === 'ipapi.co', 'one provider was enough');
+  await ctx.close();
+
+  // First provider rate-limited: the second answers.
+  const ctx2 = await browser.newContext(DESKTOP);
+  await ctx2.addInitScript(() => {
+    Object.defineProperty(navigator, 'geolocation', { value: { getCurrentPosition: (/** @type {any} */ _ok, /** @type {any} */ fail) => setTimeout(() => fail({ code: 3, PERMISSION_DENIED: 1, POSITION_UNAVAILABLE: 2, TIMEOUT: 3, message: 'timeout' }), 50) } });
+  });
+  const hits2 = await fakeIpProviders(ctx2, { ipapiFails: true });
+  const p2 = await ctx2.newPage();
+  await p2.goto(BASE);
+  await ready(p2);
+  await p2.click('#btn-locate');
+  await p2.waitForFunction(() => /near Bagalkot/.test(document.querySelector('#locate-status')?.textContent || ''), null, { timeout: 15_000 });
+  expect(hits2.join() === 'ipapi.co,ipwho.is', `falls back to ipwho.is (${hits2.join()})`);
+  await ctx2.close();
+});
+
+await check('location refused: the IP estimate is offered, never fetched without a click', async () => {
+  const ctx = await browser.newContext(DESKTOP); // no geolocation permission: PERMISSION_DENIED
+  const hits = await fakeIpProviders(ctx);
+  const page = await ctx.newPage();
+  await page.goto(BASE);
+  await ready(page);
+  await page.click('#btn-locate');
+  await page.waitForSelector('#btn-iploc', { timeout: 15_000 });
+  await page.waitForTimeout(500);
+  expect(hits.length === 0, 'no IP lookup before the reader asks');
+  await page.click('#btn-iploc');
+  await page.waitForFunction(() => /near Badami/.test(document.querySelector('#locate-status')?.textContent || ''), null, { timeout: 15_000 });
+  expect(/Pin at/.test(await page.textContent('#pin-line') || ''), 'pin dropped after the click');
+  await page.screenshot({ path: new URL('iploc-desktop.png', OUT).pathname });
+  await ctx.close();
+});
+
 // ---------------------------------------------------------------- the simulation test point
 await check('testing: "Use the simulation test point" and a "testing" search both pin the simulation point', async () => {
   const ctx = await browser.newContext(DESKTOP);
