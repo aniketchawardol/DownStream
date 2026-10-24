@@ -1,0 +1,61 @@
+# The frequent work, in ONE scheduled workflow. Four separate 5–15 minute schedules (cpcb, mailer,
+# simulator, keepalive) came to ~700 runs a day, and GitHub's scheduler quietly dropped most of them:
+# hourly and daily workflows kept running while the frequent ones stopped for hours. One run every 10
+# minutes is ~144 a day, which GitHub honours far more reliably.
+# Order matters: wake the site, fetch new readings, invent a simulated alert, then send whatever is pending.
+name: tick (keepalive, river data, simulator, mailer)
+on:
+  schedule: [{ cron: '*/10 * * * *' }]
+  workflow_dispatch: {}
+concurrency: { group: tick, cancel-in-progress: false }
+permissions: { contents: read }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci --omit=dev
+
+      # Keeps the free Render web service awake (it sleeps after 15 idle minutes). --max-time 90 waits out
+      # a cold start; a failure here must not stop the jobs below, which talk to Postgres directly.
+      - name: keep the site awake
+        continue-on-error: true
+        run: |
+          curl -fsS --retry 2 --max-time 90 -o /dev/null -w 'keepalive %{http_code} in %{time_total}s\n' \
+            "${PUBLIC_BASE_URL:-https://downstream-web.onrender.com}/api/health"
+        env:
+          PUBLIC_BASE_URL: ${{ secrets.PUBLIC_BASE_URL }}
+
+      - name: river readings and river alerts
+        continue-on-error: true
+        run: node services/worker/run-once.js cpcb
+        env:
+          NODE_ENV: production
+          JOB_TIME_BUDGET_MIN: '8'
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
+          CPCB_URL: ${{ secrets.CPCB_URL }}
+
+      - name: simulated alert (about half the time)
+        continue-on-error: true
+        run: node services/worker/run-once.js simulator
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          MOCK_MODE: ${{ secrets.MOCK_MODE || 'true' }}
+          MOCK_EMAIL: ${{ secrets.MOCK_EMAIL }}
+          MOCK_LAT: ${{ secrets.MOCK_LAT }}
+          MOCK_LNG: ${{ secrets.MOCK_LNG }}
+
+      # Last, so it sends the confirmations and alerts the steps above just created.
+      - name: send confirmations and alert emails
+        run: node services/worker/run-once.js mailer
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SMTP_URL: ${{ secrets.SMTP_URL }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          PUBLIC_BASE_URL: ${{ secrets.PUBLIC_BASE_URL }}

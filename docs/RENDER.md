@@ -22,7 +22,7 @@ Actions secrets.
 
 | Workflow | Job | Schedule | Notes |
 |---|---|---|---|
-| `cpcb.yml` | `cpcb` | every 15 minutes | River readings, river alerts. The first run backfills 7 days (about 5 minutes) |
+| `tick.yml` | keepalive + `cpcb` + `simulator` + `mailer` | every 10 minutes | The frequent work, in one run: wakes the site, fetches river readings and raises river alerts, maybe invents a simulated alert, then sends every pending email |
 | `wqmis-hierarchy.yml` | `wqmis-hierarchy` | Sunday 01:00 IST | Districts, blocks, panchayats, villages |
 | `geocode.yml` | `geocode` | Sunday 03:00 IST | OpenStreetMap locations for panchayats |
 | `wqmis-samples.yml` | `wqmis-samples` | daily 02:00 IST | New lab samples, tap alerts |
@@ -30,13 +30,20 @@ Actions secrets.
 | `wqmis-dashboard.yml` | `wqmis-dashboard` | daily 10:00 IST | National "yesterday" figures |
 | `overdue.yml` | `overdue` | daily 07:00 IST | Panchayats overdue for testing |
 | `digest.yml` | `digest` | Monday 08:00 IST | Weekly summary emails |
-| `mailer.yml` | `mailer` | every 5 minutes | Sends pending alert emails (GitHub's minimum interval) |
-| `simulator.yml` | `simulator` | every 5 minutes | Fires a simulated alert about half the time |
 | `bootstrap.yml` | `bootstrap` | manual | Fills an empty database: run once after the first deploy |
-| `keepalive.yml` | (curl) | every 10 minutes | Pings `/api/health` so the free web service never sleeps |
 | `heartbeat.yml` | (git) | 1st of each month | Empty commit; GitHub disables schedules after 60 days without activity |
 
 Crons in the files are UTC; the comments give the IST times they correspond to.
+
+**Why one `tick` workflow instead of four frequent ones.** The first version had separate 5-, 10- and
+15-minute schedules for the mailer, simulator, keepalive and CPCB: about 700 runs a day. GitHub's
+scheduler quietly dropped most of them. Hourly and daily workflows kept running while the frequent ones
+stopped for hours at a time, so river data went stale, the site slept and no alert emails went out.
+One combined run every 10 minutes is about 144 a day, which GitHub honours far more reliably.
+
+GitHub's `schedule` is best effort either way: runs are often late and can be skipped under load. If you
+want alerting you can rely on, point a free uptime pinger (cron-job.org, UptimeRobot) at
+`https://<your-url>/api/health` every 5 minutes. That alone keeps the site awake, independently of GitHub.
 
 ## Steps
 
