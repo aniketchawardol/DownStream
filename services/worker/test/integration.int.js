@@ -214,3 +214,15 @@ test('geocode overrides win over every other source', async (t) => {
   assert.ok(nowhere.geocode_confidence < 0.5);
   assert.equal(res.notes.overrides, 1);
 });
+
+test('only one mailer runs at a time (advisory lock)', async () => {
+  const { mailerJob, MAILER_LOCK } = await import('../jobs/mailer.js');
+  const holder = await sql.reserve();
+  try {
+    await holder`select pg_advisory_lock(${MAILER_LOCK})`;
+    assert.deepEqual(await mailerJob(sql), { skipped: 'another mailer is running' });
+    await holder`select pg_advisory_unlock(${MAILER_LOCK})`;
+    const r = /** @type {any} */ (await mailerJob(sql));
+    assert.equal(typeof r?.sent, 'number', 'runs once the lock is free');
+  } finally { holder.release(); }
+});

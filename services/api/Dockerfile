@@ -21,6 +21,7 @@ COPY web/package.json web/
 RUN npm ci --omit=dev && npm cache clean --force
 COPY packages/core packages/core
 COPY services/api services/api
+COPY services/worker services/worker
 COPY db db
 COPY --from=build /repo/web/dist web/dist
 EXPOSE 8080

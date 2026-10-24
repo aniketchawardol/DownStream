@@ -29,9 +29,13 @@ export const config = {
   emailDriver: env.EMAIL_DRIVER || 'smtp',
   smtpUrl: env.SMTP_URL || 'smtp://localhost:1025',
   smtpSinkUrl: env.SMTP_SINK_URL || null,
+  // Optional HTTPS relay (scripts/gmail-relay.gs, a Google Apps Script web app) used instead of SMTP_URL.
+  // Render's free plan blocks outbound SMTP ports but not HTTPS, so this lets the site send mail itself.
+  emailRelayUrl: (env.EMAIL_RELAY_URL || '').trim() || null,
+  emailRelaySecret: env.EMAIL_RELAY_SECRET || '',
   // 'inline': the web service sends confirmation emails itself. 'queue': it saves them and the scheduled
-  // mailer sends them (needed on Render's free plan, which blocks outbound SMTP ports).
-  emailDelivery: env.EMAIL_DELIVERY === 'queue' ? 'queue' : 'inline',
+  // mailer sends them (only for SMTP on Render's free plan; a relay always sends inline).
+  emailDelivery: env.EMAIL_DELIVERY === 'queue' && !(env.EMAIL_RELAY_URL || '').trim() ? 'queue' : 'inline',
   emailFrom: env.EMAIL_FROM || 'DownStream <alerts@localhost>',
   maxEmailsPerDay: num(env.MAX_EMAILS_PER_DAY, 6),
 
@@ -41,6 +45,9 @@ export const config = {
   mockLng: num(env.MOCK_LNG, 75.7),
   mockIntervalMin: num(env.MOCK_INTERVAL_MIN, 2),
   mockIntervalMax: num(env.MOCK_INTERVAL_MAX, 5),
+
+  // The web service also runs the frequent jobs (mailer, simulator, CPCB, a self keepalive) in-process.
+  webJobs: bool(env.WEB_JOBS, false),
 
   mapStyleUrl: env.MAP_STYLE_URL || 'https://tiles.openfreemap.org/styles/positron',
   rawDir: env.RAW_DIR || 'data/raw',

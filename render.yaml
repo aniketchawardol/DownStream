@@ -1,5 +1,5 @@
-# Free tier only: one web service and one Postgres. Every scheduled job (ingest, alerts, mailer, simulator)
-# runs on GitHub Actions instead of a paid Render background worker; see .github/workflows/ and docs/RENDER.md.
+# Free tier only: one web service and one Postgres. The web service also runs the frequent jobs (mailer every
+# minute, simulator, CPCB) in-process; the long WQMIS crawls run on GitHub Actions. See docs/RENDER.md.
 databases:
   - name: downstream-db
     plan: free
@@ -23,10 +23,16 @@ services:
         sync: false            # set to the Render-assigned URL after first deploy, e.g. https://downstream-web.onrender.com
       - key: EMAIL_DRIVER
         value: smtp
+      - key: EMAIL_RELAY_URL
+        sync: false            # the Apps Script web app URL (scripts/gmail-relay.gs). Render's free plan blocks SMTP ports
+      - key: EMAIL_RELAY_SECRET
+        sync: false            # the SECRET script property set in that Apps Script project
       - key: EMAIL_DELIVERY
-        value: queue            # Render's free plan blocks outbound SMTP; the GitHub Actions mailer sends confirmations
+        value: queue            # only applies without a relay: confirmations then wait for the GitHub Actions mailer
+      - key: WEB_JOBS
+        value: "true"           # mailer, simulator, CPCB and a self keepalive run inside the web service
       - key: SMTP_URL
-        sync: false            # unused while EMAIL_DELIVERY=queue (blocked on the free plan); kept for a paid plan
+        sync: false            # unused on Render (SMTP ports are blocked on the free plan); kept for a paid plan
       - key: EMAIL_FROM
         sync: false
       - key: CONTACT_EMAIL

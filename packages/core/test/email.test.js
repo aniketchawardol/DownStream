@@ -81,3 +81,35 @@ test('reserved test domains never reach a real provider', async () => {
   assert.equal(routeFor('loop@example.com', { sink: false, production: true }), 'skip', 'production: dropped, never bounced');
   assert.equal(routeFor('loop@example.com', { sink: false, production: false }), 'main', 'Mailpit-only setups keep working');
 });
+
+test('HTTPS relay: POST answered with a 302 to the result, like Apps Script', async (t) => {
+  const http = await import('node:http');
+  const { relayTransport, displayName } = await import('../email/mailer.js');
+  /** @type {any[]} */ const got = [];
+  const server = http.createServer((req, res) => {
+    let body = '';
+    req.on('data', (c) => { body += c; }).on('end', () => {
+      if (req.method === 'POST' && req.url === '/exec') {
+        const m = JSON.parse(body);
+        got.push(m);
+        res.writeHead(302, { location: `/echo?ok=${m.secret === 's3cret' ? 1 : 0}` }).end();
+      } else if (req.method === 'GET' && req.url?.startsWith('/echo')) {
+        const ok = req.url.endsWith('ok=1');
+        res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify(ok ? { ok: true, id: 'abc' } : { ok: false, error: 'bad secret' }));
+      } else res.writeHead(500, { 'content-type': 'text/html' }).end('<html><body>Script function not found</body></html>');
+    });
+  });
+  await new Promise((r) => server.listen(0, '127.0.0.1', () => r(null)));
+  t.after(() => server.close());
+  const base = `http://127.0.0.1:${/** @type {any} */ (server.address()).port}`;
+  const msg = { from: 'DownStream <gazebot.alert@gmail.com>', to: 'someone@gmail.com', subject: 'Confirm', html: '<p>hi</p>', text: 'hi' };
+
+  assert.deepEqual(await relayTransport(`${base}/exec`, 's3cret').sendMail(msg), { messageId: 'abc' });
+  assert.equal(got[0].name, 'DownStream');
+  assert.equal(got[0].to, 'someone@gmail.com');
+  assert.equal(got[0].html, '<p>hi</p>');
+  await assert.rejects(relayTransport(`${base}/exec`, 'wrong').sendMail(msg), /bad secret/);
+  await assert.rejects(relayTransport(`${base}/nope`, 's3cret').sendMail(msg), /HTTP 500, not JSON: <html><body>Script function not found/);
+  assert.equal(displayName('"Down Stream" <a@b.c>'), 'Down Stream');
+  assert.equal(displayName('a@b.c'), '');
+});

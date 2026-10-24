@@ -70,5 +70,11 @@ if (isMain) {
   await bootSql.end({ timeout: 5 });
   const app = await buildApp({ logger: true });
   await app.listen({ port: config.port, host: '0.0.0.0' });
-  for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => { app.close().finally(() => process.exit(0)); });
+  /** @type {(() => void) | null} */
+  let stopJobs = null;
+  if (config.webJobs) {
+    const { startWebJobs } = await import('../worker/web-jobs.js');
+    stopJobs = await startWebJobs(createSql({ max: 4 }));
+  }
+  for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => { stopJobs?.(); app.close().finally(() => process.exit(0)); });
 }

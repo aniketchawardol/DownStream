@@ -7,9 +7,10 @@ When it's live, fill in the "Deployed" table at the end.
 
 | Piece | Where | Plan | Role |
 |---|---|---|---|
-| `downstream-web` | Render web service (Docker, `services/api/Dockerfile`) | free | Serves the site and `/api/*`, sends confirmation emails, runs migrations at boot |
+| `downstream-web` | Render web service (Docker, `services/api/Dockerfile`) | free | Serves the site and `/api/*`, runs migrations at boot, and (`WEB_JOBS=true`) runs the frequent jobs in-process: the mailer every minute, the simulator, CPCB every 15 minutes, a self keepalive |
+| Email relay | Google Apps Script web app (`scripts/gmail-relay.gs`) on the sending Gmail account | free | Sends mail over HTTPS, because Render's free plan blocks SMTP ports |
 | `downstream-db` | Render Postgres | free (deleted 30 days after creation) | All data. PostGIS and citext are enabled by the first migration |
-| Scheduled jobs | GitHub Actions (`.github/workflows/`) | free in a **public** repository | Each workflow runs one job with `node services/worker/run-once.js <job>` against the database's external URL |
+| Long jobs | GitHub Actions (`.github/workflows/`) | free in a **public** repository | The WQMIS crawls, geocoding, digest and a backup wake-up, each with `node services/worker/run-once.js <job>` against the database's external URL |
 
 There's no background worker on Render: Render has no free plan for workers. Locally, `docker compose up`
 still runs every job in one `worker` container with node-cron, unchanged.
@@ -22,7 +23,7 @@ Actions secrets.
 
 | Workflow | Job | Schedule | Notes |
 |---|---|---|---|
-| `tick.yml` | keepalive + `cpcb` + `simulator` + `mailer` | every 10 minutes | The frequent work, in one run: wakes the site, fetches river readings and raises river alerts, maybe invents a simulated alert, then sends every pending email |
+| `tick.yml` | keepalive + `mailer` | every 10 minutes | Backup only: wakes the site if it slept, then sends anything pending. The web service does this work itself |
 | `wqmis-hierarchy.yml` | `wqmis-hierarchy` | Sunday 01:00 IST | Districts, blocks, panchayats, villages |
 | `geocode.yml` | `geocode` | Sunday 03:00 IST | OpenStreetMap locations for panchayats |
 | `wqmis-samples.yml` | `wqmis-samples` | daily 02:00 IST | New lab samples, tap alerts |
@@ -35,15 +36,17 @@ Actions secrets.
 
 Crons in the files are UTC; the comments give the IST times they correspond to.
 
-**Why one `tick` workflow instead of four frequent ones.** The first version had separate 5-, 10- and
-15-minute schedules for the mailer, simulator, keepalive and CPCB: about 700 runs a day. GitHub's
-scheduler quietly dropped most of them. Hourly and daily workflows kept running while the frequent ones
-stopped for hours at a time, so river data went stale, the site slept and no alert emails went out.
-One combined run every 10 minutes is about 144 a day, which GitHub honours far more reliably.
+**Why the frequent jobs run in the web service.** The first version ran the mailer, simulator, keepalive
+and CPCB as separate 5–15 minute GitHub schedules: about 700 runs a day. GitHub's scheduler quietly dropped
+most of them, so river data went stale, the site slept and alert emails waited hours. Hourly and daily
+workflows were unaffected, so those stay on GitHub.
 
-GitHub's `schedule` is best effort either way: runs are often late and can be skipped under load. If you
-want alerting you can rely on, point a free uptime pinger (cron-job.org, UptimeRobot) at
-`https://<your-url>/api/health` every 5 minutes. That alone keeps the site awake, independently of GitHub.
+**Why mail goes through a relay.** Since September 2025 Render's free plan blocks outbound SMTP ports
+(25, 465, 587), so the web service can't reach `smtp.gmail.com`. HTTPS isn't blocked. The site POSTs each
+email to a small Google Apps Script web app running on the Gmail account, and Gmail sends it from that
+address. Confirmation emails go out while the subscribe request is still open, and alert emails within a
+minute. Without a relay the site falls back to queueing confirmations for the GitHub `tick` mailer, which
+is slow and unreliable.
 
 ## Steps
 
@@ -71,7 +74,23 @@ want alerting you can rely on, point a free uptime pinger (cron-job.org, UptimeR
 
 3. When the web service is live, set its `PUBLIC_BASE_URL` (**downstream-web > Environment**) to its URL,
    for example `https://downstream-web.onrender.com`.
-4. **Add the GitHub secrets:** in the repository, **Settings > Secrets and variables > Actions > New
+4. **Set up the email relay** (about 5 minutes, signed in to Google as the sending account,
+   gazebot.alert@gmail.com):
+   1. Open https://script.google.com and create a **New project**. Replace `Code.gs` with
+      `scripts/gmail-relay.gs` from this repository, then save.
+   2. **Project Settings** (gear icon) > **Script Properties** > **Add script property**: `SECRET` = a long
+      random string (for example from `node -e "console.log(crypto.randomUUID())"`).
+   3. **Deploy > New deployment** > select type **Web app**. Set *Execute as* to **Me** and *Who has access* to
+      **Anyone**, then press **Deploy**. Approve the permission to send email as you. Google warns the app is
+      unverified, because it's your own script: choose **Advanced > Go to project**.
+   4. Copy the **Web app URL** (`https://script.google.com/macros/s/…/exec`). Opening it in a browser should
+      show `{"ok":true,"service":"DownStream email relay",…}`.
+   5. On Render, open **downstream-web > Environment** and set `EMAIL_RELAY_URL` to that URL and
+      `EMAIL_RELAY_SECRET` to the same secret. Check that `WEB_JOBS` is `true`. Save; Render redeploys.
+
+   The service log then shows `web jobs started … "mailer":true`. If you change the script later, use
+   **Deploy > Manage deployments > edit > Version: New version**, or the URL keeps serving the old code.
+5. **Add the GitHub secrets:** in the repository, **Settings > Secrets and variables > Actions > New
    repository secret**.
 
    | Secret | Value | Needed |
@@ -80,41 +99,50 @@ want alerting you can rely on, point a free uptime pinger (cron-job.org, UptimeR
    | `SMTP_URL` | same as on Render | yes |
    | `EMAIL_FROM` | `DownStream <gazebot.alert@gmail.com>` | yes |
    | `CONTACT_EMAIL` | `gazebot.alert@gmail.com` | yes |
-   | `PUBLIC_BASE_URL` | the site's URL. Used in email links and by `keepalive` | yes |
+   | `PUBLIC_BASE_URL` | the site's URL. Used in email links and by the `tick` wake-up | yes |
    | `CPCB_URL`, `WQMIS_STATES`, `WQMIS_DISTRICTS`, `MOCK_LAT`, `MOCK_LNG`, `MOCK_MODE` | only to change the defaults (CPCB layer 10; Karnataka 15; Bagalkote 187; 16.18, 75.70; `true`) | no |
    | `MOCK_EMAIL` | an address to pre-subscribe at the simulation point. Usually leave unset and subscribe from the site | no |
 
    The external URL is a `*.render.com` host; the jobs connect to it over TLS automatically.
-5. **Fill the database:** **Actions > "bootstrap (fill an empty database)" > Run workflow.** It loads CPCB
+6. **Fill the database:** **Actions > "bootstrap (fill an empty database)" > Run workflow.** It loads CPCB
    with history, the WQMIS hierarchy, panchayat locations, samples and the dashboard. From GitHub's US
    runners WQMIS is about 10× slower than from India (around 20 minutes per block, so 3–4 hours for
    Bagalkote's 9 blocks). The run has a time budget and stops cleanly before GitHub's limit, saving its
    place. If its log ends with `samples_incomplete`, run it again and it continues from where it
    stopped. After that the schedules keep the data current; daily runs only re-read panchayats whose
    test counts changed. Lab reports trickle in hourly.
-6. **Check:**
+7. **Check:**
    - `https://<url>/api/health` returns 200;
    - in **Actions**, each workflow's **Run workflow** button completes green;
    - the site's freshness ledger shows each source as "Working".
 
 ## Getting the simulated alerts
 
-**Confirmation emails arrive within about 5–15 minutes.** Render's free plan blocks outgoing email ports (25, 465, 587), so the site can't send mail itself. With `EMAIL_DELIVERY=queue` (set in `render.yaml`) it saves the subscription and the GitHub Actions mailer sends the confirmation on its next run.
+On the site, under **Get email alerts**, press **Use the simulation test point** (or search "testing"),
+enter your email and press **Send confirmation email**. With the relay set up, the confirmation is sent
+before the page answers, and usually lands within a few seconds. Click its link.
 
-On the site, under **Get email alerts**, press **Use the simulation test point** (or type "testing" in the
-place search), enter your email, press **Send confirmation email** and click the link in the email. The
-simulator workflow runs every 5 minutes and fires about half the time, so expect roughly one simulated
-alert every 10 minutes (more spaced out when GitHub's scheduler is busy). Urgent ones always send; the
-mailer workflow delivers within about 5 minutes. Each email carries a one-click unsubscribe link.
+From then on the web service invents one simulated alert every 2–5 minutes (`MOCK_INTERVAL_MIN`..`MAX`);
+every run fires, there's no coin flip. Alerts created before you clicked the link are never emailed.
+Delivery follows the spec's anti-spam rules:
+
+- **Urgent** alerts (contamination, a river reading past its limit) are emailed within a minute, always.
+- **Notice** alerts are bundled: at most one email per 15 minutes, and at most `MAX_EMAILS_PER_DAY` (6) a
+  day per address. Past the cap they go into the weekly summary.
+
+Each email ends with an unsubscribe link. Mail sent through the relay has no `List-Unsubscribe` header,
+because Apps Script can't set custom headers.
 
 ## Things to know
 
-- **The Render free allowance is 750 instance-hours a month.** Keepalive keeps `downstream-web` up around
-  the clock, about 720–744 hours. That's fine while it's the only free web service in the Render
+- **The Render free allowance is 750 instance-hours a month.** The service pings its own public URL every 10
+  minutes (and the `tick` workflow pings it too), so `downstream-web` stays up around the clock, about
+  720–744 hours. That's fine while it's the only free web service in the Render
   workspace; a second one would compete for the same hours.
-- **GitHub's scheduler is best effort.** Five-minute schedules are often delayed, sometimes by tens of
-  minutes, and occasionally skipped when GitHub is busy. Data jobs tolerate that. Alerts may arrive later
-  than they would from an always-on worker.
+- **GitHub's scheduler is best effort.** Frequent schedules are often delayed or skipped, which is why the
+  mailer and simulator moved into the web service. The daily and weekly crawls tolerate delays. If the site
+  ever does fall asleep, a free uptime pinger (cron-job.org, UptimeRobot) on `/api/health` every 5 minutes
+  is a sturdier wake-up than GitHub.
 - **GitHub's terms.** Actions is meant for building and testing software. Using it to run a service's
   scheduled jobs is a grey area of its terms: light use is commonly tolerated, but GitHub can disable
   workflows it considers abusive. If that happens, the same `run-once.js` jobs can run from any free cron
@@ -125,8 +153,10 @@ mailer workflow delivers within about 5 minutes. Each email carries a one-click 
   India; CPCB's certificate check was rejected by one fetcher only because of the revoked certificate
   noted in docs/SOURCES.md, which Node doesn't check. If the `cpcb` workflow ever fails with timeouts or
   403s, CPCB has started refusing foreign IPs.
-- **Gmail limits.** Personal Gmail allows about 500 messages a day. Many subscribers at the test point can
-  reach it, and Gmail then pauses sending for up to a day.
+- **Gmail limits.** Through Apps Script, a personal Gmail account can email about 100 recipients a day
+  (`https://<relay url>` in a browser shows what's left). Each confirmation and each alert email counts.
+  Past the limit the relay returns an error, and the mailer retries up to 5 times before giving up on that
+  email.
 
 ## Deployed
 
@@ -134,6 +164,6 @@ mailer workflow delivers within about 5 minutes. Each email carries a one-click 
 |---|---|
 | Live URL | (not deployed yet) |
 | Region | singapore |
-| SMTP provider | Gmail SMTP (`smtp.gmail.com:465`, app password); login verified and a real confirmation email delivered on 23 Oct 2026 |
+| Email | Gmail through the Apps Script relay on Render (SMTP ports are blocked there); Gmail SMTP (`smtp.gmail.com:465`, app password) locally and from GitHub Actions |
 | Render services | `downstream-web` (free), `downstream-db` (free) |
 | Scheduled jobs | GitHub Actions, public repository (free) |

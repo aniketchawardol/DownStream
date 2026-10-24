@@ -182,7 +182,7 @@ await check('location refused: search for a place instead', async () => {
   await page.goto(BASE);
   await ready(page);
   await page.click('#btn-locate');
-  await page.waitForSelector('#place-search:not([hidden])', { timeout: 15_000 });
+  await page.waitForSelector('#place-search', { state: 'visible', timeout: 15_000 });
   expect(/Search for a district, block, panchayat, town or PIN code instead|Search for a place instead/.test(await page.textContent('#locate-status') || ''), 'asks for a place instead');
   await page.fill('#place-q', 'Badami');
   await page.keyboard.press('Enter');
@@ -205,6 +205,66 @@ await check('testing: "Use the simulation test point" and a "testing" search bot
   const r = await fetch(`${BASE}/api/search?q=testing`).then((x) => x.json());
   expect(r.results[0]?.name === 'Simulation test point', `search "testing" finds the test point (${r.results[0]?.name})`);
   await ctx.close();
+});
+
+// ---------------------------------------------------------------- place search is always on screen
+/** The search bar is visible, near the top, centred on the map, and nothing is drawn over it. @param {import('playwright-core').Page} page @param {string} when */
+async function searchOnTop(page, when) {
+  const r = await page.evaluate(() => {
+    const f = /** @type {HTMLElement} */ (document.querySelector('#place-search'));
+    const b = f.getBoundingClientRect();
+    const m = /** @type {HTMLElement} */ (document.querySelector('#map-wrap')).getBoundingClientRect();
+    const hit = document.elementFromPoint(b.left + 12, b.top + b.height / 2);
+    return { top: b.top, mid: b.left + b.width / 2, mapMid: m.left + m.width / 2, w: b.width, uncovered: !!hit && f.contains(hit), shown: b.height > 0 && getComputedStyle(f).visibility !== 'hidden' };
+  });
+  expect(r.shown, `search visible ${when}`);
+  expect(r.uncovered, `nothing covers the search ${when}`);
+  expect(r.top >= 0 && r.top < 120, `search at the top ${when} (top ${Math.round(r.top)} px)`);
+  expect(Math.abs(r.mid - r.mapMid) < 4, `search centred on the map ${when} (${Math.round(r.mid)} vs ${Math.round(r.mapMid)})`);
+}
+
+await check('place search stays at the top centre after a pin, a selection and a scroll (desktop and phone)', async () => {
+  const ctx = await browser.newContext(DESKTOP);
+  const page = await ctx.newPage();
+  await page.goto(BASE);
+  await ready(page);
+  await searchOnTop(page, 'on load');
+  const box = await page.locator('#map').boundingBox();
+  await page.mouse.click((box?.x ?? 0) + (box?.width ?? 0) * 0.55, (box?.y ?? 0) + (box?.height ?? 0) * 0.6);
+  await page.waitForFunction(() => /Pin at/.test(document.querySelector('#pin-line')?.textContent || ''));
+  await page.waitForTimeout(800);
+  await searchOnTop(page, 'after a pin');
+  await page.click('#btn-alerts');
+  await page.waitForTimeout(900);
+  await searchOnTop(page, 'after the panel scrolled to alerts');
+  await page.fill('#place-q', 'Badami');
+  await page.keyboard.press('Enter');
+  await page.waitForSelector('#search-results button', { timeout: 15_000 });
+  await page.click('#search-results button');
+  await page.waitForTimeout(800);
+  await searchOnTop(page, 'after picking a search result');
+  await page.screenshot({ path: new URL('search-desktop-after-pin.png', OUT).pathname });
+  await ctx.close();
+
+  const pctx = await browser.newContext(PHONE);
+  const phone = await pctx.newPage();
+  await phone.goto(BASE);
+  await ready(phone);
+  await searchOnTop(phone, 'on a phone');
+  await phone.click('#btn-alerts');                 // snaps the sheet to full height
+  await phone.waitForTimeout(900);
+  await searchOnTop(phone, 'on a phone with the sheet at full height');
+  await phone.fill('#place-q', 'Badami');
+  await phone.keyboard.press('Enter');
+  await phone.waitForSelector('#search-results button', { timeout: 15_000 });
+  const covered = await phone.evaluate(() => {
+    const b = /** @type {HTMLElement} */ (document.querySelector('#search-results button')).getBoundingClientRect();
+    const hit = document.elementFromPoint(b.left + 10, b.top + b.height / 2);
+    return !document.querySelector('#search-results')?.contains(hit);
+  });
+  expect(!covered, 'phone: search results draw above the sheet');
+  await phone.screenshot({ path: new URL('search-phone-sheet-full.png', OUT).pathname });
+  await pctx.close();
 });
 
 // ---------------------------------------------------------------- map click, radius, form errors

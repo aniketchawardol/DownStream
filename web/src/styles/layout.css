@@ -58,7 +58,7 @@
   .map-wrap { position: fixed; left: 0; right: 0; top: var(--band-h); bottom: 0; }
   .sheet {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
-    top: calc(var(--band-h) + 8px);
+    top: calc(var(--band-h) + var(--search-h) + 8px);
     display: flex; flex-direction: column;
     transform: translateY(var(--sheet-y, 50vh));
     background: var(--page);

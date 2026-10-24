@@ -38,10 +38,11 @@
   --gutter: 24px;
   --band-h: 0px;
   --sim-h: 38px;
+  --search-h: 0px;  /* phones: room the fixed place search takes above the sheet */
 }
 /* Simulation mode is known at first paint (the server adds .sim), so the band's height is reserved up front. */
 :root.sim { --band-h: var(--sim-h); }
-@media (max-width: 899px) { :root { --sim-h: 56px; } }
+@media (max-width: 899px) { :root { --sim-h: 56px; --search-h: 60px; } }
 
 @media (prefers-color-scheme: dark) {
   :root {

@@ -15,6 +15,16 @@
     <div class="sim-band" id="sim-band" role="status" hidden>Simulation mode is on. Alerts marked as simulated are invented for testing.</div>
     <div class="notice-band" id="notice-band" role="status" hidden></div>
 
+    <!-- Always on screen: fixed at the top centre of the map, above the phone sheet. -->
+    <form class="place-search" id="place-search" role="search" aria-label="Search for a place">
+      <label class="sr-only" for="place-q">Search for a district, block, panchayat, town or PIN code</label>
+      <div class="place-search-row">
+        <input id="place-q" name="q" type="search" autocomplete="off" minlength="2" maxlength="80" required placeholder="Search a district, block, panchayat, town or PIN" />
+        <button type="submit" class="btn">Search</button>
+      </div>
+      <ul class="search-results" id="search-results" aria-live="polite"></ul>
+    </form>
+
     <div class="layout" id="layout">
       <div class="map-wrap" id="map-wrap">
         <div id="map" class="map" role="region" aria-label="Map of river stations and tested panchayats. Use the list of places for keyboard access."></div>
@@ -51,15 +61,7 @@
               <button type="button" class="btn btn-primary" id="btn-locate">Use my location</button>
               <button type="button" class="btn" id="btn-alerts">Get alerts</button>
             </div>
-            <form class="place-search" id="place-search" role="search" hidden>
-              <label for="place-q">Search for a district, block, panchayat, town or PIN code</label>
-              <div class="place-search-row">
-                <input id="place-q" name="q" type="search" autocomplete="off" minlength="2" maxlength="80" required placeholder="For example Badami or 587201" />
-                <button type="submit" class="btn">Search</button>
-              </div>
-              <p class="hint">Or click anywhere on the map to drop a pin.</p>
-              <ul class="search-results" id="search-results" aria-live="polite"></ul>
-            </form>
+            <p class="hint">Or search for a place at the top of the map, or click anywhere on it to drop a pin.</p>
             <p class="status-line" id="locate-status" role="status"></p>
           </section>
 

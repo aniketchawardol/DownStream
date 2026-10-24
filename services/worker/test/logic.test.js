@@ -64,16 +64,12 @@ test('TLS for Render external database URLs only', async () => {
   assert.equal(needsTls('postgres://u:p@example.org/db?sslmode=require'), true);
 });
 
-test('simulator tick: off without MOCK_MODE, otherwise fires about half the time', async () => {
+test('simulator tick: off without MOCK_MODE', async () => {
   const { simulatorTick } = await import('../jobs/simulator.js');
   const { config } = await import('@lt/core/config.js');
   const prev = config.mockMode;
   config.mockMode = false;
   assert.deepEqual(await simulatorTick(/** @type {any} */ (null)), { fired: false, reason: 'MOCK_MODE is off' });
-  config.mockMode = true;
-  const fakeSql = /** @type {any} */ (() => Promise.resolve([]));
-  const quiet = await simulatorTick(fakeSql, () => 0.9).catch((e) => ({ error: String(e) }));
-  assert.equal(/** @type {any} */ (quiet).fired, false, 'coin above 0.5: no alert');
   config.mockMode = prev;
 });
 

@@ -160,7 +160,6 @@ function openSubscribe() {
 }
 
 function showSearch(reason) {
-  els.searchForm.hidden = false;
   els.locateStatus.textContent = reason;
   /** @type {HTMLInputElement} */ (els.searchForm.querySelector('input')).focus();
 }
@@ -211,6 +210,8 @@ els.searchForm.addEventListener('submit', async (e) => {
     els.searchResults.innerHTML = `<li class="note">${esc(/** @type {Error} */ (err).message)}</li>`;
   }
 });
+
+els.searchForm.addEventListener('keydown', (e) => { if (e.key === 'Escape') els.searchResults.innerHTML = ''; });
 
 /* ---------- Map (lazy) ---------- */
 

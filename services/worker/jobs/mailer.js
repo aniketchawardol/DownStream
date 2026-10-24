@@ -129,9 +129,26 @@ export async function mailerCycle(sql, deps = {}) {
   return { confirmations, sent, waited, digested, failed };
 }
 
-/** @param {import('@lt/core/db.js').Sql} sql */
+/** Advisory lock key: one mailer at a time across every process using this database. */
+export const MAILER_LOCK = 772_001;
+
+/**
+ * Runs one cycle unless another mailer (the web service, a deploy's old instance, a GitHub run) holds the lock.
+ * The lock is session-level, so it's taken and released on one reserved connection.
+ * @param {import('@lt/core/db.js').Sql} sql
+ */
 export const mailerJob = async (sql) => {
-  try { return await mailerCycle(sql); } catch (err) { log.error('mailer cycle failed', { error: String(err) }); return null; }
+  const conn = await sql.reserve();
+  try {
+    const [{ got }] = await conn`select pg_try_advisory_lock(${MAILER_LOCK}) as got`;
+    if (!got) return { skipped: 'another mailer is running' };
+    try { return await mailerCycle(sql); } finally { await conn`select pg_advisory_unlock(${MAILER_LOCK})`; }
+  } catch (err) {
+    log.error('mailer cycle failed', { error: String(err) });
+    return null;
+  } finally {
+    conn.release();
+  }
 };
 
 /** One-shot entrypoint (services/worker/run-once.js, used by GitHub Actions). */

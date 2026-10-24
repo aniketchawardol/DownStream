@@ -11,7 +11,7 @@ import { isMobile } from './format.js';
  */
 export function initSheet(sheet, handle, grips, onChange) {
   /** @type {Snap} */ let current = 'half';
-  /** The sheet's untransformed top edge (CSS top: band height + 8 px). */
+  /** The sheet's untransformed top edge (CSS top: band height + search bar + 8 px). */
   const top = () => Number.parseFloat(getComputedStyle(sheet).top) || 0;
   const positions = () => {
     const h = window.innerHeight;

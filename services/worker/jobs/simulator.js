@@ -1,14 +1,14 @@
 // @ts-check
-// MOCK_MODE only. Two ways to run:
-// - Local worker: one simulated alert at a random interval of MOCK_INTERVAL_MIN..MAX minutes (startSimulator).
-// - GitHub Actions: invoked on a fixed 5-minute schedule; each run flips a coin (~50%) so alerts stay sporadic (run).
+// MOCK_MODE only. Every run fires one simulated alert; there's no coin flip. Two ways to run:
+// - Local worker and the deployed web service: one alert every MOCK_INTERVAL_MIN..MAX minutes, the gap picked
+//   at random each time (startSimulator).
+// - One-shot (run-once.js): one alert per invocation (run).
 import { config } from '@lt/core/config.js';
 import { logger } from '@lt/core/log.js';
 import { fireMockAlert, seedMockSubscription } from '@lt/core/simulator.js';
 import { oneShot } from '../lib/one-shot.js';
 
 const log = logger('simulator');
-export const FIRE_CHANCE = 0.5;
 
 /** @param {import('@lt/core/db.js').Sql} sql @returns {() => void} stop */
 export function startSimulator(sql) {
@@ -35,13 +35,12 @@ export function startSimulator(sql) {
 }
 
 /**
- * One scheduled tick: keep the optional seeded subscriber in step with MOCK_EMAIL, then maybe fire.
- * @param {import('@lt/core/db.js').Sql} sql @param {() => number} [rnd]
+ * One tick: keep the optional seeded subscriber in step with MOCK_EMAIL, then fire.
+ * @param {import('@lt/core/db.js').Sql} sql
  */
-export async function simulatorTick(sql, rnd = Math.random) {
+export async function simulatorTick(sql) {
   if (!config.mockMode) return { fired: false, reason: 'MOCK_MODE is off' };
   await seedMockSubscription(sql);
-  if (rnd() >= FIRE_CHANCE) return { fired: false, reason: 'coin said not this time' };
   const r = await fireMockAlert(sql);
   log.info('simulated alert', { kind: r.kind, title: r.title, deliveries: r.deliveries });
   return { fired: true, kind: r.kind, title: r.title, deliveries: r.deliveries };
