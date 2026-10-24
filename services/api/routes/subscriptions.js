@@ -45,9 +45,11 @@ export default async function subscriptions(app, { sql, config, mailer }) {
       insert into subscription (email, geom, radius_km, kinds, confirm_token, unsubscribe_token)
       values (${email}, ST_SetSRID(ST_MakePoint(${b.lng}, ${b.lat}), 4326)::geography, ${radius_km}, ${b.kinds}, ${sub.confirm_token}, ${sub.unsubscribe_token})
       returning id`;
+    if (config.emailDelivery === 'queue') return reply.code(202).send({ status: 'confirmation_queued', email });
     const msg = renderConfirmation({ ...sub, near: near?.name ?? null }, config.publicBaseUrl);
     try {
       await mailer.send({ to: email, ...msg });
+      await sql`update subscription set confirm_sent_at = now() where id = ${row.id}`;
       await sql`insert into email_message (subscription_id, kind, subject) values (${row.id}, 'confirm', ${msg.subject})`;
     } catch (err) {
       req.log.error({ err }, 'confirmation email failed');

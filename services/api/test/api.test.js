@@ -238,3 +238,18 @@ test('server-rendered first paint: live hero and simulation band in the HTML, SP
   assert.equal((await app.inject('/api/nope')).statusCode, 404);
   assert.equal((await app.inject('/missing.js')).statusCode, 404);
 });
+
+test('queue mode (Render free plan): the subscription is saved and nothing is sent from the web service', async (t) => {
+  if (!needDb(t)) return;
+  const { config } = await import('@lt/core/config.js');
+  const prev = config.emailDelivery;
+  config.emailDelivery = 'queue';
+  const before = outbox.length;
+  const r = await app.inject({ method: 'POST', url: '/api/subscriptions', payload: { email: 'queued@example.in', lat: 16.18, lng: 75.7, radius_km: 10, kinds: ['tap'] }, remoteAddress: '10.7.0.1' });
+  config.emailDelivery = prev;
+  assert.equal(r.statusCode, 202);
+  assert.deepEqual(r.json(), { status: 'confirmation_queued', email: 'queued@example.in' });
+  assert.equal(outbox.length, before, 'no SMTP from the web service');
+  const [row] = await sql`select confirm_sent_at, confirmed_at from subscription where email = 'queued@example.in'`;
+  assert.deepEqual({ ...row }, { confirm_sent_at: null, confirmed_at: null });
+});

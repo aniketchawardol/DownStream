@@ -23,8 +23,10 @@ services:
         sync: false            # set to the Render-assigned URL after first deploy, e.g. https://downstream-web.onrender.com
       - key: EMAIL_DRIVER
         value: smtp
+      - key: EMAIL_DELIVERY
+        value: queue            # Render's free plan blocks outbound SMTP; the GitHub Actions mailer sends confirmations
       - key: SMTP_URL
-        sync: false            # the web service sends confirmation emails; never commit this value
+        sync: false            # unused while EMAIL_DELIVERY=queue (blocked on the free plan); kept for a paid plan
       - key: EMAIL_FROM
         sync: false
       - key: CONTACT_EMAIL

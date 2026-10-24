@@ -174,6 +174,25 @@ test('tap alerts: new contaminated sample, geogenic roll-up, overdue, and the we
   assert.match(full.Text, /Collected .*\. Analysed .*\. First seen by this site/);
 });
 
+test('queued confirmation emails are sent once by the mailer', async (t) => {
+  if (skip) return t.skip(skip);
+  const qEmail = `queued-${Date.now()}@example.com`;
+  await sql`insert into subscription (email, geom, radius_km, kinds, confirm_token, unsubscribe_token)
+    values (${qEmail}, ST_SetSRID(ST_MakePoint(75.7, 16.18), 4326)::geography, 10, '{tap}', ${`ct-${Date.now()}`}, ${`ut-${Date.now()}`})`;
+  const first = await mailerCycle(sql, { now: new Date() });
+  assert.equal(first.confirmations, 1);
+  assert.equal((await mailerCycle(sql, { now: new Date() })).confirmations, 0, 'never sent twice');
+  let msg;
+  for (let i = 0; i < 20 && !msg; i++) {
+    const r = await fetch(`${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:"${qEmail}"`)}`).then((x) => x.json());
+    msg = r.messages?.[0];
+    if (!msg) await new Promise((res) => setTimeout(res, 300));
+  }
+  assert.equal(msg?.Subject, 'Confirm your DownStream water alerts');
+  const full = await fetch(`${MAILPIT}/api/v1/message/${msg.ID}`).then((x) => x.json());
+  assert.match(full.Text, /http:\/\/site\.test\/api\/subscriptions\/confirm\?token=ct-/);
+});
+
 test('geocode overrides win over every other source', async (t) => {
   if (skip) return t.skip(skip);
   const [d] = await sql`insert into wq_area (level, jjm_id, state_id, name) values ('district', '187', 15, 'Bagalkote') returning id`;

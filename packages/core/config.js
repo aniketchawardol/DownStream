@@ -29,6 +29,9 @@ export const config = {
   emailDriver: env.EMAIL_DRIVER || 'smtp',
   smtpUrl: env.SMTP_URL || 'smtp://localhost:1025',
   smtpSinkUrl: env.SMTP_SINK_URL || null,
+  // 'inline': the web service sends confirmation emails itself. 'queue': it saves them and the scheduled
+  // mailer sends them (needed on Render's free plan, which blocks outbound SMTP ports).
+  emailDelivery: env.EMAIL_DELIVERY === 'queue' ? 'queue' : 'inline',
   emailFrom: env.EMAIL_FROM || 'DownStream <alerts@localhost>',
   maxEmailsPerDay: num(env.MAX_EMAILS_PER_DAY, 6),
 

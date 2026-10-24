@@ -47,7 +47,9 @@ export function initSubscribe(form) {
     show('Sending the confirmation email.', '');
     try {
       const r = await subscribe({ email: email.value.trim(), lat: state.pin.lat, lng: state.pin.lng, radius_km: state.radius, kinds });
-      show(`Confirmation sent to ${r.email}. Open it to start alerts.`, 'done');
+      show(r.status === 'confirmation_queued'
+        ? `Confirmation email on its way to ${r.email}. It usually arrives within 15 minutes; check spam too. Open it to start alerts.`
+        : `Confirmation sent to ${r.email}. Open it to start alerts.`, 'done');
       form.reset();
       out.value = `${state.radius} km`;
       radius.value = String(state.radius);

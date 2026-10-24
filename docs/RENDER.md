@@ -92,6 +92,8 @@ Crons in the files are UTC; the comments give the IST times they correspond to.
 
 ## Getting the simulated alerts
 
+**Confirmation emails arrive within about 5–15 minutes.** Render's free plan blocks outgoing email ports (25, 465, 587), so the site can't send mail itself. With `EMAIL_DELIVERY=queue` (set in `render.yaml`) it saves the subscription and the GitHub Actions mailer sends the confirmation on its next run.
+
 On the site, under **Get email alerts**, press **Use the simulation test point** (or type "testing" in the
 place search), enter your email, press **Send confirmation email** and click the link in the email. The
 simulator workflow runs every 5 minutes and fires about half the time, so expect roughly one simulated

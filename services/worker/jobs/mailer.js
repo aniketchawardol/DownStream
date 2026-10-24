@@ -8,7 +8,7 @@
 import { config } from '@lt/core/config.js';
 import { logger } from '@lt/core/log.js';
 import { createMailer } from '@lt/core/email/mailer.js';
-import { renderAlertEmail } from '@lt/core/email/templates.js';
+import { renderAlertEmail, renderConfirmation } from '@lt/core/email/templates.js';
 import { istDayStart } from '@lt/core/time.js';
 import { oneShot } from '../lib/one-shot.js';
 
@@ -29,12 +29,45 @@ export function decide(p) {
 }
 
 /**
+ * Confirmation emails the web service queued (EMAIL_DELIVERY=queue). Each row is claimed before sending so it
+ * goes out once even if two mailers overlap; a failed send is released for the next run. Gives up after a day.
+ * @param {import('@lt/core/db.js').Sql} sql @param {import('@lt/core/email/mailer.js').Mailer} mailer
+ */
+export async function sendQueuedConfirmations(sql, mailer) {
+  const claimed = await sql`
+    update subscription s set confirm_sent_at = now()
+    where s.id in (
+      select id from subscription
+      where confirmed_at is null and confirm_sent_at is null and unsubscribed_at is null and created_at > now() - interval '1 day'
+      order by created_at limit 50 for update skip locked)
+    returning s.id, s.email, s.radius_km, s.kinds, s.confirm_token, s.unsubscribe_token,
+      ST_Y(s.geom::geometry) as lat, ST_X(s.geom::geometry) as lng,
+      (select g.name from wq_area g where g.level = 'gp' and g.geom is not null and g.geocode_confidence >= 0.5
+       order by g.geom <-> s.geom limit 1) as near`;
+  let sent = 0;
+  for (const s of claimed) {
+    const msg = renderConfirmation({ ...s, kinds: s.kinds }, config.publicBaseUrl);
+    try {
+      await mailer.send({ to: s.email, ...msg });
+      await sql`insert into email_message (subscription_id, kind, subject) values (${s.id}, 'confirm', ${msg.subject})`;
+      sent++;
+    } catch (err) {
+      await sql`update subscription set confirm_sent_at = null where id = ${s.id}`;
+      log.error('confirmation send failed; will retry', { error: String(/** @type {Error} */ (err).message).slice(0, 200) });
+    }
+  }
+  if (claimed.length) log.info('queued confirmations sent', { sent, of: claimed.length });
+  return sent;
+}
+
+/**
  * @param {import('@lt/core/db.js').Sql} sql
  * @param {{ mailer?: import('@lt/core/email/mailer.js').Mailer, now?: Date }} [deps]
  */
 export async function mailerCycle(sql, deps = {}) {
   const mailer = deps.mailer ?? createMailer();
   const now = deps.now ?? new Date();
+  const confirmations = await sendQueuedConfirmations(sql, mailer);
   // Deliveries for subscriptions that have since been unsubscribed are dropped.
   await sql`
     update delivery d set status = 'skipped', error = 'unsubscribed'
@@ -93,7 +126,7 @@ export async function mailerCycle(sql, deps = {}) {
       log.error('send failed', { attempts, error: msg });
     }
   }
-  return { sent, waited, digested, failed };
+  return { confirmations, sent, waited, digested, failed };
 }
 
 /** @param {import('@lt/core/db.js').Sql} sql */
