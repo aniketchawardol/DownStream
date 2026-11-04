@@ -15,6 +15,9 @@ const { createSql } = await import('@lt/core/db.js');
 const { migrate } = await import('@lt/core/migrate.js');
 const { buildApp } = await import('../server.js');
 
+/** The IST calendar day n days ago, YYYY-MM-DD. @param {number} n */
+const istDay = (n) => new Date(Date.now() + 330 * 60_000 - n * 86400_000).toISOString().slice(0, 10);
+
 /** @type {any} */ let sql;
 /** @type {any} */ let app;
 /** @type {any[]} */ const outbox = [];
@@ -39,6 +42,11 @@ before(async () => {
   for (let h = 0; h < 48; h++) {
     await sql`insert into cpcb_reading (station_no, parameter, value, unit, measured_at) values ('UK55', 'DO', ${h === 0 ? 3.2 : 7 + (h % 3) / 10}, 'mg/l', now() - interval '20 minutes' - ${`${h} hours`}::interval)`;
     await sql`insert into cpcb_reading (station_no, parameter, value, unit, measured_at) values ('UK55', 'EC', 300, 'mS/cm', now() - interval '20 minutes' - ${`${h} hours`}::interval)`;
+  }
+  // CPCB daily history for UK55 DO: a day 400 days back, one outside the limit 10 days back, one normal
+  // 5 days back, and today, which CPCB's row must win over the day derived from hourly readings.
+  for (const [n, mean] of /** @type {const} */ ([[400, 8.1], [10, 3.5], [5, 7.0], [0, 9.9]])) {
+    await sql`insert into cpcb_daily (station_no, parameter, day, min, mean, max, coverage) values ('UK55', 'DO', ${istDay(n)}, ${mean - 0.5}, ${mean}, ${mean + 0.5}, 100)`;
   }
   const [d] = await sql`insert into wq_area (level, jjm_id, state_id, name, geom, geocode_source, geocode_confidence) values ('district', '187', 15, 'Bagalkote', ST_SetSRID(ST_MakePoint(75.7, 16.18), 4326)::geography, 'nominatim', 0.8) returning id`;
   const [b] = await sql`insert into wq_area (level, jjm_id, parent_id, state_id, name, geom, geocode_source, geocode_confidence) values ('block', '2481', ${d.id}, 15, 'Badami', ST_SetSRID(ST_MakePoint(75.68, 15.92), 4326)::geography, 'nominatim', 0.8) returning id`;
@@ -116,6 +124,88 @@ test('GET /api/areas and /api/areas/:id/samples', async (t) => {
   assert.equal(s.samples[0].results.length, 2);
   assert.match(s.samples[0].report_url, /final_report_print\?s_id=abc%2B%2F%3D$/);
   assert.equal((await app.inject('/api/areas/999999/samples')).statusCode, 404);
+});
+
+test('GET /api/stations/:no/history: CPCB daily rows plus derived days, limit counts, ranges', async (t) => {
+  if (!needDb(t)) return;
+  let r = await app.inject('/api/stations/UK55/history?range=1y');
+  assert.equal(r.statusCode, 200);
+  const j = r.json();
+  assert.equal(j.bucket, 'day');
+  const DO = j.params.find((/** @type {any} */ p) => p.parameter === 'DO');
+  assert.deepEqual(DO.limit, { min: 4 });
+  const byDay = new Map(DO.points.map((/** @type {any[]} */ p) => [p[0], p]));
+  assert.equal(byDay.get(istDay(10))[2], 3.5, 'CPCB daily mean');
+  assert.equal(byDay.get(istDay(0))[2], 9.9, 'a CPCB row beats the day derived from hourly readings');
+  assert.ok(byDay.has(istDay(1)), 'yesterday is derived from hourly readings');
+  assert.ok(!byDay.has(istDay(400)), 'outside the 1-year range');
+  assert.equal(DO.summary.days_outside, 1);
+  assert.deepEqual(DO.summary.lowest, { value: 3.5, day: istDay(10) });
+  const EC = j.params.find((/** @type {any} */ p) => p.parameter === 'EC');
+  assert.equal(EC.summary.days_outside, null, 'no limit, no count');
+  assert.equal(EC.unit, 'µS/cm');
+
+  r = await app.inject('/api/stations/UK55/history?range=all');
+  const all = r.json();
+  assert.equal(all.bucket, 'week');
+  const DOall = all.params.find((/** @type {any} */ p) => p.parameter === 'DO');
+  assert.equal(DOall.summary.first_day, istDay(400));
+  assert.ok(DOall.points.every((/** @type {any[]} */ p) => new Date(`${p[0]}T00:00:00Z`).getUTCDay() === 1), 'weeks start on Monday');
+
+  assert.equal((await app.inject('/api/stations/UK55/history?range=5y')).statusCode, 400);
+  assert.equal((await app.inject('/api/stations/ZZ99/history')).statusCode, 404);
+
+  r = await app.inject('/api/stations/UK55/history.csv');
+  assert.equal(r.statusCode, 200);
+  assert.match(r.headers['content-type'], /text\/csv/);
+  assert.match(r.headers['content-disposition'], /cpcb-UK55-daily\.csv/);
+  const lines = r.body.trim().split('\n');
+  assert.equal(lines[0], 'date_ist,parameter,unit,daily_min,daily_mean,daily_max,coverage_percent');
+  assert.ok(lines.includes(`${istDay(10)},DO,mg/l,3,3.5,4,100`));
+});
+
+test('GET /api/ganga: main-stem stations in river order with values aligned to frames', async (t) => {
+  if (!needDb(t)) return;
+  const r = await app.inject('/api/ganga?param=DO&span=year');
+  assert.equal(r.statusCode, 200);
+  const j = r.json();
+  assert.equal(j.bucket, 'day');
+  assert.equal(j.frames.at(-1), istDay(0));
+  assert.equal(j.frames.length, 11, 'leading days with no data at any station are trimmed');
+  const uk55 = j.stations.find((/** @type {any} */ s) => s.station_no === 'UK55');
+  assert.equal(uk55.place, 'Haridwar');
+  assert.equal(uk55.km, 0, 'the first station present starts the distance count');
+  assert.equal(uk55.values.length, j.frames.length);
+  assert.equal(uk55.values[j.frames.indexOf(istDay(10))], 3.5);
+  const monthly = (await app.inject('/api/ganga?param=DO&span=all')).json();
+  assert.equal(monthly.bucket, 'month');
+  assert.ok(monthly.frames.every((/** @type {string} */ f) => f.endsWith('-01')));
+  assert.equal((await app.inject('/api/ganga?param=COD')).statusCode, 400);
+});
+
+test('GET /api/areas/:id/history and a single sample by id', async (t) => {
+  if (!needDb(t)) return;
+  const [g] = await sql`select id from wq_area where level = 'gp' and name = 'Adagal'`;
+  let r = await app.inject(`/api/areas/${g.id}/history`);
+  assert.equal(r.statusCode, 200);
+  const h = r.json();
+  assert.equal(h.total, 2);
+  assert.deepEqual(h.samples.map((/** @type {any} */ s) => s.sample_id), ['U1S1', 'U1S2'], 'newest first');
+  assert.deepEqual(h.samples[0].failing, ['Fluoride (as F)']);
+  assert.equal(h.months.length, 2);
+  const fl = h.params.find((/** @type {any} */ p) => p.parameter === 'fluoride');
+  assert.deepEqual(fl.points[0].slice(1), [1.93, 2, 0], 'value, status code (above permissible), sample index');
+  assert.equal(fl.above_permissible, 1);
+  assert.equal(h.params[0].parameter, 'fluoride', 'failures first');
+  assert.equal(h.params.find((/** @type {any} */ p) => p.parameter === 'e_coli').presence, true);
+
+  r = await app.inject(`/api/areas/${g.id}/history.csv`);
+  assert.match(r.headers['content-type'], /text\/csv/);
+  assert.match(r.body, /Fluoride \(as F\),1\.930,mg\/l,1,1\.5,above_permissible/);
+
+  r = await app.inject(`/api/areas/${g.id}/samples?sample_id=U1S2`);
+  assert.deepEqual(r.json().samples.map((/** @type {any} */ s) => s.sample_id), ['U1S2']);
+  assert.equal((await app.inject('/api/areas/999999/history')).statusCode, 404);
 });
 
 test('GET /api/nearby returns distances and ages; rejects points outside India', async (t) => {

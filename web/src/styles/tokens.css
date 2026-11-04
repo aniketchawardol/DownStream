@@ -24,6 +24,8 @@
   --sim: #D4A017;
   --sim-ink: #2B2200;
   --shadow-sheet: 0 -6px 24px rgba(20, 28, 30, 0.18);
+  --seq-lo: #CFE3EE;          /* value ramp for measures with no limit (turbidity, temperature) */
+  --seq-hi: #123F61;
 
   --font-ui: 'Anek Latin Variable', 'Anek Latin', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-body: 'Source Serif 4 Variable', 'Source Serif 4', Georgia, 'Times New Roman', serif;
@@ -68,5 +70,7 @@
     --sim: #C99A1C;
     --sim-ink: #1A1500;
     --shadow-sheet: 0 -6px 24px rgba(0, 0, 0, 0.45);
+    --seq-lo: #24404D;
+    --seq-hi: #A8D3F0;
   }
 }

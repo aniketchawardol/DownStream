@@ -120,6 +120,7 @@ export function renderPlaces(body, onSelect) {
 
 const SOURCES = /** @type {Record<string, string>} */ ({
   cpcb: 'CPCB river stations (every 15 minutes)',
+  'cpcb-history': 'CPCB daily history since 2021 (monthly)',
   'wqmis-samples': 'WQMIS sample lists (daily)',
   'wqmis-reports': 'WQMIS lab reports (hourly while a backlog exists)',
   'wqmis-hierarchy': 'WQMIS districts, blocks and panchayats (weekly)',

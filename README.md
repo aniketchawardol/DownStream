@@ -4,12 +4,17 @@ What India's government water data says about a place, how old that data is, and
 new or worrying is published.
 
 - **Rivers (fast):** CPCB's 40 real-time stations in the Ganga basin, read every 15 minutes, with every
-  new reading kept.
+  new reading kept, plus CPCB's daily low, average and high for every station back to November 2021.
 - **Taps (slow):** Jal Jeevan Mission laboratory results (WQMIS) for rural drinking-water sources,
   covering Bagalkote district (196 panchayats, about 12,500 samples over two financial years).
 - Both on one map, where every marker's ring shows how fresh its data is. You can ask "what's near me",
   subscribe to a pin and radius by email, and run a simulation mode that invents clearly labelled alerts
   for demos.
+- Every marker opens its full history: five years of daily river data, or every lab sample a panchayat
+  has had, as interactive charts, tables and CSV downloads.
+- **The Ganga** (button at the top right of the map, or `/?ganga`): the river from Tehri to the Hooghly,
+  each stretch coloured by its station's reading, with a profile along the river, a station-by-day heat
+  map, and Play to animate a year day by day or five years month by month.
 
 ![Desktop, light](docs/screenshots/home-1440-light.png)
 
@@ -48,13 +53,16 @@ data; `npm run db:reset` wipes it.
 1. Open http://localhost:5173. The hero sentence gives the age of the freshest river reading and of the
    latest tap test.
 2. Zoom into the Ganga to see river rings, or click the Bagalkote marker for panchayats.
-3. Choose a station for its 48-hour charts, or a panchayat for its lab-report rulers.
-4. Under "Get email alerts", press **Use the simulation test point**, or type "testing" in the place
+3. Choose a station for its 48-hour charts, or a panchayat for its lab-report rulers. Open the
+   **History** tab of either for everything since 2021 (stations) or every sample (panchayats).
+4. Press **The Ganga** at the top right of the map. Switch between dissolved oxygen and BOD, press Play,
+   then click a station on the river to open its history.
+5. Under "Get email alerts", press **Use the simulation test point**, or type "testing" in the place
    search. Enter your email and press "Send confirmation email". With a real `SMTP_URL` (see
    docs/RENDER.md) the confirmation arrives in your inbox; with the example settings, in Mailpit. Open it
    and click the link.
-5. Simulated alerts arrive every few minutes, marked `[Simulated]`.
-6. Fire an urgent one now:
+6. Simulated alerts arrive every few minutes, marked `[Simulated]`.
+7. Fire an urgent one now:
 
    ```sh
    curl -X POST "http://localhost:8080/api/dev/simulate?kind=tap_contamination"
@@ -87,7 +95,7 @@ The browser checks cover the following, among others:
 
 ```sh
 docker compose exec worker node services/worker/run-once.js <job>
-# cpcb | wqmis-hierarchy | geocode | wqmis-samples | wqmis-reports | wqmis-dashboard | overdue | digest | mailer | simulator | bootstrap
+# cpcb | cpcb-history | wqmis-hierarchy | geocode | wqmis-samples | wqmis-reports | wqmis-dashboard | overdue | digest | mailer | simulator | bootstrap
 ```
 
 ## How it is built

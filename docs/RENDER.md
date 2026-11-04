@@ -24,6 +24,7 @@ Actions secrets.
 | Workflow | Job | Schedule | Notes |
 |---|---|---|---|
 | `tick.yml` | keepalive + `mailer` | every 10 minutes | Backup only: wakes the site if it slept, then sends anything pending. The web service does this work itself |
+| `cpcb-history.yml` | `cpcb-history` | 1st of each month | Each station's daily low, average and high since November 2021, from CPCB's `year.json` files (~480 files, about 10 minutes the first time, ~90 MB in Postgres). Feeds the History tabs and the Ganga view |
 | `wqmis-hierarchy.yml` | `wqmis-hierarchy` | Sunday 01:00 IST | Districts, blocks, panchayats, villages |
 | `geocode.yml` | `geocode` | Sunday 03:00 IST | OpenStreetMap locations for panchayats |
 | `wqmis-samples.yml` | `wqmis-samples` | daily 02:00 IST | New lab samples, tap alerts |
@@ -105,7 +106,7 @@ is slow and unreliable.
 
    The external URL is a `*.render.com` host; the jobs connect to it over TLS automatically.
 6. **Fill the database:** **Actions > "bootstrap (fill an empty database)" > Run workflow.** It loads CPCB
-   with history, the WQMIS hierarchy, panchayat locations, samples and the dashboard. From GitHub's US
+   with its daily history since 2021, the WQMIS hierarchy, panchayat locations, samples and the dashboard. From GitHub's US
    runners WQMIS is about 10× slower than from India (around 20 minutes per block, so 3–4 hours for
    Bagalkote's 9 blocks). The run has a time budget and stops cleanly before GitHub's limit, saving its
    place. If its log ends with `samples_incomplete`, run it again and it continues from where it
@@ -115,6 +116,10 @@ is slow and unreliable.
    - `https://<url>/api/health` returns 200;
    - in **Actions**, each workflow's **Run workflow** button completes green;
    - the site's freshness ledger shows each source as "Working".
+
+   A site deployed before the History tabs existed has no daily history yet: run **Actions > "cpcb history
+   (daily since 2021)" > Run workflow** once. Until it finishes, History shows only the days this site
+   collected itself, and the Ganga view starts on the first of those days.
 
 ## Getting the simulated alerts
 

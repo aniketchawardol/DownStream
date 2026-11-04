@@ -45,3 +45,15 @@ test('week.json history parses to readings; an empty stale series yields none', 
   assert.ok(readings.every((r) => r.station_no === 'UT67' && r.parameter === 'DO' && r.unit === 'mg/l'));
   assert.equal(parseCpcbSeries(fixture('week-WB90-DO-stale.json')).readings.length, 0);
 });
+
+test('year.json: Day.Min, Day.Mean and Day.Max merge into one row per IST day', async () => {
+  const { parseCpcbDaily } = await import('../parsers/cpcb.js');
+  const { days, warnings } = parseCpcbDaily(fixture('year-UK55-DO.json'));
+  assert.deepEqual(warnings, []);
+  assert.equal(days.length, 5);
+  // 2021-11-26T18:30Z is midnight IST on the 27th.
+  assert.deepEqual(days[0], { day: '2021-11-27', min: 9.8, mean: 10.07, max: 10.32, coverage: 45.84 });
+  assert.ok(days.every((d) => d.min <= d.mean && d.mean <= d.max), 'min <= mean <= max');
+  assert.equal(days.at(-1).day, '2026-11-04');
+  assert.deepEqual(parseCpcbDaily([{ ts_name: 'Week.Mean', data: [] }]).warnings, ['unexpected series Week.Mean']);
+});

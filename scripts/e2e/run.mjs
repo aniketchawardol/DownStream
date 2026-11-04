@@ -252,6 +252,92 @@ await check('location refused: the IP estimate is offered, never fetched without
   await ctx.close();
 });
 
+// ---------------------------------------------------------------- history behind every marker
+await check('station history: charts since 2021, period switch, readable values, CSV', async () => {
+  const ctx = await browser.newContext(DESKTOP);
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/?station=UK55`);
+  await page.waitForSelector('#selected [role="tab"]', { timeout: 30_000 });
+  expect(await page.getAttribute('#selected [role="tab"][data-tab="now"]', 'aria-selected') === 'true', 'opens on the last 48 hours');
+  await page.click('#selected [role="tab"][data-tab="history"]');
+  await page.waitForSelector('#selected .chart-host svg', { timeout: 30_000 });
+  expect((await page.locator('#selected .chart-host svg').count()) >= 6, 'a chart per parameter');
+  await page.click('#selected [data-range="all"]');
+  await page.waitForFunction(() => /since \d+ \w+ 2021/.test(document.querySelector('#selected .hist-sum')?.textContent || ''), null, { timeout: 30_000 });
+  // Keyboard: focus the first chart and step back with the arrow keys; the tooltip names a date.
+  await page.focus('#selected .tchart-plot');
+  await page.keyboard.press('End');
+  await page.keyboard.press('ArrowLeft');
+  const tip = await page.locator('#selected .tchart-tip:not([hidden])').first().innerText();
+  expect(/Week of \d+ \w+ \d{4}/.test(tip) && /Average/.test(tip), `keyboard tooltip: ${tip}`);
+  const csv = await page.getAttribute('#selected .csv-link a', 'href');
+  const res = await fetch(`${BASE}${csv}`);
+  expect(res.ok && /^date_ist,parameter/.test(await res.text()), 'CSV download works');
+  await page.screenshot({ path: new URL('history-station-1440.png', OUT).pathname });
+  await ctx.close();
+});
+
+await check('panchayat history: every sample, month strip, opening an old sample from the table', async () => {
+  if (!areaId) throw new Error('no tested panchayat in the database');
+  const ctx = await browser.newContext(DESKTOP);
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/?area=${areaId}`);
+  await page.waitForSelector('#selected [role="tab"][data-tab="history"]', { timeout: 30_000 });
+  await page.click('#selected [role="tab"][data-tab="history"]');
+  await page.waitForSelector('#selected .month-strip', { timeout: 30_000 });
+  expect(/samples? between/.test(await page.textContent('#selected .hist-lead') || ''), 'summary sentence');
+  await page.click('#selected details.records summary');
+  const oldest = page.locator('#selected details.records [data-open]').last();
+  const when = (await oldest.textContent())?.trim();
+  await oldest.click();
+  await page.waitForSelector('#selected [role="tab"][data-tab="latest"][aria-selected="true"]');
+  await page.waitForFunction((w) => (document.querySelector('#selected .verdict')?.textContent || '').includes(/** @type {string} */ (w)), when, { timeout: 15_000 });
+  await page.screenshot({ path: new URL('history-panchayat-1440.png', OUT).pathname });
+  await ctx.close();
+});
+
+// ---------------------------------------------------------------- the Ganga
+await check('the Ganga: opens from the map, plays, picks a station, closes with Escape (desktop and phone)', async () => {
+  const ctx = await browser.newContext(DESKTOP);
+  const page = await ctx.newPage();
+  await page.goto(BASE);
+  await page.click('#btn-ganga'); // works before the map or data have loaded
+  await page.waitForSelector('#ganga .node', { timeout: 30_000 });
+  expect(await page.evaluate(() => document.activeElement?.id) === 'ganga-h', 'focus moves to the dialog heading');
+  expect((await page.locator('#ganga .node').count()) >= 15, 'main-stem stations');
+  expect(await page.evaluate(() => /** @type {any} */ (document.querySelector('#layout')).inert), 'the page behind is inert');
+  const headline = await page.textContent('#ganga .ganga-headline') || '';
+  expect(/within CPCB's limit .* at \d+ of \d+ reporting stations/.test(headline), `headline: ${headline}`);
+  await page.waitForTimeout(2200); // the river draws itself
+  await page.screenshot({ path: new URL('ganga-1440.png', OUT).pathname });
+  const before = await page.textContent('#ganga .ganga-date');
+  await page.click('#ganga .ganga-play');
+  await page.waitForTimeout(1200);
+  await page.click('#ganga .ganga-play');
+  expect(before !== await page.textContent('#ganga .ganga-date'), 'Play moves through the days');
+  await page.click('#ganga [data-span="all"]');
+  await page.waitForFunction(() => /\w+ \d{4}$/.test(document.querySelector('#ganga .ganga-date')?.textContent || '') && !/^\d/.test(document.querySelector('#ganga .ganga-date')?.textContent || ''), null, { timeout: 30_000 });
+  await page.focus('#ganga .node >> nth=1');
+  await page.keyboard.press('Enter');
+  await page.waitForSelector('#ganga', { state: 'hidden' });
+  await page.waitForFunction(() => new URLSearchParams(location.search).has('station'));
+  await page.waitForSelector('#selected [role="tab"]');
+  await page.goto(`${BASE}/?ganga`);
+  await page.waitForSelector('#ganga .node', { timeout: 30_000 });
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#ganga', { state: 'hidden' });
+  await ctx.close();
+
+  const pctx = await browser.newContext(PHONE);
+  const phone = await pctx.newPage();
+  await phone.goto(`${BASE}/?ganga`);
+  await phone.waitForSelector('#ganga .vrow', { timeout: 30_000 });
+  await phone.waitForTimeout(2200);
+  expect(await phone.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'no sideways scroll on a phone');
+  await phone.screenshot({ path: new URL('ganga-390.png', OUT).pathname });
+  await pctx.close();
+});
+
 // ---------------------------------------------------------------- the simulation test point
 await check('testing: "Use the simulation test point" and a "testing" search both pin the simulation point', async () => {
   const ctx = await browser.newContext(DESKTOP);

@@ -6,6 +6,7 @@ import { config } from '@lt/core/config.js';
 import { logger } from '@lt/core/log.js';
 import { seedMockSubscription } from '@lt/core/simulator.js';
 import { cpcbJob } from './jobs/cpcb.js';
+import { historyJob } from './jobs/cpcb-history.js';
 import { hierarchyJob } from './jobs/wqmis-hierarchy.js';
 import { samplesJob, reportsJob } from './jobs/wqmis-samples.js';
 import { dashboardJob } from './jobs/wqmis-dashboard.js';
@@ -38,6 +39,7 @@ export async function startSchedule(sql) {
   const tz = { timezone: 'Asia/Kolkata' };
   const tasks = [
     cron.schedule('*/15 * * * *', () => guarded('cpcb', () => cpcbJob(sql)), tz),
+    cron.schedule('30 3 1 * *', () => guarded('cpcb-history', () => historyJob(sql)), tz),
     cron.schedule('0 1 * * 0', () => guarded('wqmis-hierarchy', async () => { await hierarchyJob(sql); await geocodeJob(sql); }, { lane: 'wqmis' }), tz),
     cron.schedule('0 2 * * *', () => guarded('wqmis-samples', () => samplesJob(sql), { lane: 'wqmis' }), tz),
     cron.schedule('20 * * * *', () => guarded('wqmis-reports', () => reportsJob(sql), { lane: 'wqmis' }), tz),
@@ -60,6 +62,8 @@ export async function startSchedule(sql) {
   // job's last success, so a run interrupted by a restart is simply run again.
   (async () => {
     await guarded('cpcb', () => cpcbJob(sql));
+    const [{ nohistory }] = await sql`select count(*)::int as nohistory from cpcb_station where history_at is null and site_no is not null`;
+    if (nohistory) await guarded('cpcb-history', () => historyJob(sql));
     const ok = async (/** @type {string} */ source, /** @type {string} */ within) => {
       const [r] = await sql`select 1 from source_health where source = ${source} and last_success_at > now() - ${within}::interval`;
       return !!r;

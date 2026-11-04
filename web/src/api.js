@@ -25,8 +25,18 @@ export const getAreas = () => api('/areas');
 export const getHealth = () => api('/health');
 /** @param {string} no */
 export const getSeries = (no) => api(`/stations/${encodeURIComponent(no)}/series?hours=48`);
+/** @param {string} no @param {number} hours */
+export const getSeriesHours = (no, hours) => api(`/stations/${encodeURIComponent(no)}/series?hours=${hours}`);
+/** @param {string} no @param {'30d'|'1y'|'all'} range */
+export const getStationHistory = (no, range) => api(`/stations/${encodeURIComponent(no)}/history?range=${range}`);
 /** @param {string} id */
 export const getSamples = (id) => api(`/areas/${encodeURIComponent(id)}/samples`);
+/** @param {string} id @param {string} sampleId */
+export const getSample = (id, sampleId) => api(`/areas/${encodeURIComponent(id)}/samples?sample_id=${encodeURIComponent(sampleId)}`);
+/** @param {string} id */
+export const getAreaHistory = (id) => api(`/areas/${encodeURIComponent(id)}/history`);
+/** @param {string} param @param {'year'|'all'} span */
+export const getGanga = (param, span) => api(`/ganga?param=${encodeURIComponent(param)}&span=${span}`);
 /** @param {number} lat @param {number} lng @param {number} r */
 export const getNearby = (lat, lng, r) => api(`/nearby?lat=${lat}&lng=${lng}&radius_km=${r}`);
 /** @param {URLSearchParams} q */

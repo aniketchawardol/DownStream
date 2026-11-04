@@ -212,6 +212,16 @@ els.locate.addEventListener('click', () => {
 
 els.alertsBtn.addEventListener('click', openSubscribe);
 
+// "The Ganga": a full-screen view, loaded on demand; it fetches its own data, so it works before the map
+// has loaded. Picking a station in it opens that station here. /?ganga opens it straight away.
+const gangaBtn = /** @type {HTMLButtonElement} */ ($('#btn-ganga'));
+async function openRiver() {
+  const { openGanga } = await import('./ganga.js');
+  openGanga({ opener: gangaBtn, onSelect: (no) => select('station', no) });
+}
+gangaBtn.addEventListener('pointerdown', (e) => e.stopPropagation()); // not a reason to load the phone's map
+gangaBtn.addEventListener('click', openRiver);
+
 els.searchForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const q = /** @type {HTMLInputElement} */ (els.searchForm.querySelector('input')).value.trim();
@@ -322,6 +332,7 @@ async function boot() {
   if (q.get('station')) select('station', /** @type {string} */ (q.get('station')), { focus: false });
   else if (q.get('area')) select('area', /** @type {string} */ (q.get('area')), { focus: false });
   else if (q.get('sim')) select('sim', /** @type {string} */ (q.get('sim')), { focus: false });
+  if (q.has('ganga')) openRiver();
 
   // The map comes after the hero has painted. Phones get a schematic first and load the map on intent.
   if (isMobile() && !state.selected) {

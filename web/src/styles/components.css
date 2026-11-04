@@ -376,3 +376,104 @@ input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--survey);
 .sch-note { font: 400 11px/1 var(--font-ui); fill: var(--ink-soft); }
 .sch-hit { cursor: pointer; }
 .sch-open { position: absolute; left: 50%; transform: translateX(-50%); z-index: 4; white-space: nowrap; }
+
+/* ---------- Tabs (station and panchayat panels) ---------- */
+.tabs { display: flex; gap: 2px; margin: 18px 0 0; border-bottom: 1px solid var(--rule); }
+.tabs [role="tab"] {
+  border: 0; background: none; cursor: pointer; color: var(--ink-soft);
+  font: 600 var(--t16)/1.3 var(--font-ui); padding: 10px 12px 9px; margin-bottom: -1px;
+  border-bottom: 3px solid transparent;
+}
+.tabs [role="tab"]:hover { color: var(--ink); }
+.tabs [role="tab"][aria-selected="true"] { color: var(--ink); border-bottom-color: var(--survey); }
+.tabpanel { padding-top: 6px; }
+.tabpanel:focus { outline: none; }
+
+/* ---------- Segmented period buttons ---------- */
+.seg-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 6px; }
+.seg-btn {
+  border: 1px solid var(--rule); background: var(--raised); color: var(--ink); border-radius: var(--r-pill);
+  padding: 5px 12px; font: 500 var(--t14)/1.3 var(--font-ui); cursor: pointer;
+}
+.seg-btn[aria-pressed="true"] { background: var(--survey); border-color: var(--survey); color: var(--on-survey); }
+
+/* ---------- History cards and interactive charts ---------- */
+.hist-lead { font: 500 var(--t16)/1.45 var(--font-ui); margin: 12px 0 8px; }
+.hist-card { padding: 12px 0 8px; border-top: 1px solid var(--rule-soft); }
+.hist-card h3 { font: 600 var(--t16)/1.3 var(--font-ui); margin: 0 0 2px; }
+.hist-card h3 small { font-weight: 400; color: var(--ink-soft); margin-left: 4px; }
+.hist-sum { font: 400 var(--t14)/1.45 var(--font-ui); color: var(--ink-soft); margin: 0 0 6px; }
+.hist-card .foot { font: 400 var(--t12)/1.35 var(--font-ui); color: var(--ink-soft); margin: 2px 0 0; }
+.tchart { position: relative; }
+.tchart-plot { position: relative; border-radius: var(--r-data); }
+.tchart-plot:focus-visible { outline: 2px solid var(--survey); outline-offset: 2px; }
+.tchart-plot.pickable .hit { cursor: pointer; }
+.tchart svg { display: block; overflow: visible; touch-action: pan-y; }
+.tchart .axis text { font: 400 11px/1 var(--font-ui); fill: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.tchart .axis line { stroke: var(--rule); }
+.tchart .axis line.grid { stroke: var(--rule-soft); }
+.tchart .band { fill: var(--ok); opacity: .12; }
+.tchart .band-edge { stroke: var(--ok); stroke-dasharray: 3 3; opacity: .8; }
+.tchart .range { fill: var(--survey); opacity: .16; }
+.tchart .mean { fill: none; stroke: var(--survey); stroke-width: 1.6; stroke-linejoin: round; }
+.tchart .lone { fill: var(--survey); }
+.tchart .dot { stroke: var(--page); stroke-width: 1; }
+.tchart .dot.ok { fill: var(--ok); } .tchart .dot.caution { fill: var(--caution); } .tchart .dot.danger { fill: var(--danger); } .tchart .dot.none { fill: var(--ink-soft); }
+.tchart .ref { stroke-dasharray: 4 3; stroke-width: 1.2; }
+.tchart .ref.caution { stroke: var(--caution); } .tchart .ref.danger { stroke: var(--danger); }
+.tchart .ref-label { font: 500 10.5px/1 var(--font-ui); }
+.tchart .ref-label.caution { fill: var(--caution-ink); } .tchart .ref-label.danger { fill: var(--danger-ink); }
+.tchart .hit { fill: transparent; }
+.tchart .cross-x { stroke: var(--ink); stroke-width: 1; opacity: .5; }
+.tchart .cross-dot { fill: var(--page); stroke: var(--ink); stroke-width: 2; }
+.tchart-tip {
+  position: absolute; z-index: 3; pointer-events: none; max-width: 230px;
+  background: var(--ink); color: var(--page); border-radius: 6px; padding: 6px 9px;
+  font: 400 var(--t12)/1.4 var(--font-ui); white-space: normal;
+}
+.tchart-tip strong { font-weight: 600; }
+.tchart-tip .status-word { font-size: var(--t12); color: inherit; }
+.tchart-tip small { opacity: .8; }
+
+/* Month strip (panchayat history) */
+.strip-fig { margin: 4px 0 14px; }
+.strip-fig figcaption { font: 400 var(--t12)/1.5 var(--font-ui); color: var(--ink-soft); }
+.month-strip { display: block; overflow: visible; }
+.month-strip .seg.ok { fill: var(--ok); } .month-strip .seg.caution { fill: var(--caution); }
+.month-strip .seg.danger { fill: var(--danger); } .month-strip .seg.none { fill: var(--ink-soft); }
+.month-strip .hit { fill: transparent; }
+.month-strip g:hover .seg { opacity: .8; }
+.month-strip .axis text { font: 400 10.5px/1 var(--font-ui); fill: var(--ink-soft); }
+.month-strip .axis line { stroke: var(--rule); }
+.key { white-space: nowrap; margin-left: 6px; }
+.key::before { content: ''; display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.key.ok::before { background: var(--ok); } .key.caution::before { background: var(--caution); } .key.danger::before { background: var(--danger); }
+.presence { margin: 4px 0 12px; padding-left: 18px; font: 400 var(--t14)/1.5 var(--font-ui); }
+.presence li { margin: 4px 0; }
+.presence .btn-text { font-size: var(--t14); }
+.more-params > summary, .records > summary { cursor: pointer; font: 600 var(--t16)/1.4 var(--font-ui); padding: 10px 0; border-top: 1px solid var(--rule-soft); }
+
+/* Records tables */
+.table-scroll { overflow: auto; max-height: 420px; border: 1px solid var(--rule-soft); border-radius: var(--r-data); }
+.table-scroll:focus-visible { outline: 2px solid var(--survey); }
+.table-scroll table { border-collapse: collapse; width: 100%; font: 400 var(--t14)/1.35 var(--font-ui); font-variant-numeric: tabular-nums; }
+.table-scroll th, .table-scroll td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--rule-soft); white-space: nowrap; }
+.table-scroll th[scope="row"], .table-scroll td:nth-child(2) { text-align: left; }
+.table-scroll thead th { position: sticky; top: 0; background: var(--raised); font-weight: 600; text-align: right; }
+.table-scroll thead th:first-child { text-align: left; }
+.table-scroll thead small { display: block; font-weight: 400; color: var(--ink-soft); }
+.table-scroll td .status-word { font-size: var(--t14); }
+.table-scroll .btn-text { font-size: var(--t14); }
+.csv-link { font: 500 var(--t14)/1.4 var(--font-ui); margin: 12px 0 0; }
+
+/* ---------- "The Ganga" button, top right of the map ---------- */
+.ganga-btn {
+  position: absolute; z-index: 3; top: calc(var(--search-h) + 80px); right: 10px;
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--rule); background: var(--page); color: var(--ink); border-radius: var(--r-pill);
+  padding: 6px 13px 6px 10px; font: 600 var(--t14)/1.2 var(--font-ui); cursor: pointer;
+}
+.ganga-btn svg { width: 20px; height: 14px; color: var(--survey); }
+.ganga-btn:hover { background: var(--raised); border-color: var(--survey); }
+/* Phones: the fixed place search covers the top of the map, so the map's own buttons move below it. */
+@media (max-width: 899px) { .map-wrap .maplibregl-ctrl-top-right { top: var(--search-h); } }

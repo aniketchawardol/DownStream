@@ -143,3 +143,44 @@ export function parseCpcbSeries(json) {
   }
   return { readings, warnings };
 }
+
+/** @typedef {{ day: string, min: number|null, mean: number|null, max: number|null, coverage: number|null }} CpcbDay */
+
+/** "2021-11-26T18:30:00.000Z" (midnight IST) -> "2021-11-27". @param {Date} t */
+const istDay = (t) => new Date(t.getTime() + 330 * 60_000).toISOString().slice(0, 10);
+
+/**
+ * Parse a KISTERS year.json: three daily series for one station and parameter, named Day.Min, Day.Mean and
+ * Day.Max, each with columns "Timestamp,Value,Aggregation Accuracy %". Merged into one row per IST day.
+ * Coverage is taken from the mean series (the share of the day's readings that arrived).
+ * @param {unknown} json
+ * @returns {{ days: CpcbDay[], warnings: string[] }}
+ */
+export function parseCpcbDaily(json) {
+  /** @type {string[]} */
+  const warnings = [];
+  /** @type {Map<string, CpcbDay>} */
+  const byDay = new Map();
+  const blocks = Array.isArray(json) ? json : [json];
+  for (const b of blocks) {
+    if (!b || typeof b !== 'object' || !Array.isArray(b.data)) { warnings.push('series block without data array'); continue; }
+    const kind = /** @type {Record<string, 'min'|'mean'|'max'>} */ ({ 'day.min': 'min', 'day.mean': 'mean', 'day.max': 'max' })[String(b.ts_name || b.ts_shortname || '').trim().toLowerCase()];
+    if (!kind) { warnings.push(`unexpected series ${String(b.ts_name).slice(0, 40)}`); continue; }
+    const cols = String(b.columns || 'Timestamp,Value').split(',').map((c) => c.trim().toLowerCase());
+    const ti = Math.max(0, cols.indexOf('timestamp'));
+    const vi = cols.indexOf('value') >= 0 ? cols.indexOf('value') : 1;
+    const ci = cols.findIndex((c) => c.startsWith('aggregation'));
+    for (const row of b.data) {
+      if (!Array.isArray(row)) continue;
+      const at = new Date(row[ti]);
+      if (Number.isNaN(at.getTime())) continue;
+      const day = istDay(at);
+      const d = byDay.get(day) ?? { day, min: null, mean: null, max: null, coverage: null };
+      d[kind] = toNum(row[vi]);
+      if (kind === 'mean' && ci >= 0) d.coverage = toNum(row[ci]);
+      byDay.set(day, d);
+    }
+  }
+  const days = [...byDay.values()].filter((d) => d.min != null || d.mean != null || d.max != null).sort((a, b) => (a.day < b.day ? -1 : 1));
+  return { days, warnings };
+}

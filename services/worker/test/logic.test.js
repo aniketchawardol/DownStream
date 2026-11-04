@@ -74,7 +74,7 @@ test('simulator tick: off without MOCK_MODE', async () => {
 });
 
 test('every scheduled job has a one-shot run() entrypoint', async () => {
-  for (const name of ['cpcb', 'wqmis-hierarchy', 'wqmis-samples', 'wqmis-reports', 'wqmis-dashboard', 'geocode', 'overdue', 'digest', 'mailer', 'simulator', 'bootstrap']) {
+  for (const name of ['cpcb', 'cpcb-history', 'wqmis-hierarchy', 'wqmis-samples', 'wqmis-reports', 'wqmis-dashboard', 'geocode', 'overdue', 'digest', 'mailer', 'simulator', 'bootstrap']) {
     const mod = await import(`../jobs/${name}.js`);
     assert.equal(typeof mod.run, 'function', `${name}.js exports run()`);
   }

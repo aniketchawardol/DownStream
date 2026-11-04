@@ -5,6 +5,7 @@ import { logger } from '@lt/core/log.js';
 import { istDate, fiscalYear } from '@lt/core/time.js';
 import { oneShot } from '../lib/one-shot.js';
 import { cpcbJob } from './cpcb.js';
+import { historyJob } from './cpcb-history.js';
 import { hierarchyJob } from './wqmis-hierarchy.js';
 import { geocodeJob } from './geocode.js';
 import { samplesJob } from './wqmis-samples.js';
@@ -22,6 +23,8 @@ export async function bootstrapCycle(sql) {
   /** @type {Record<string, unknown>} */
   const ran = {};
   if (!(await fresh('cpcb', '1 hour'))) ran.cpcb = (await cpcbJob(sql)).ok;
+  const [{ nohistory }] = await sql`select count(*)::int as nohistory from cpcb_station where history_at is null and site_no is not null`;
+  if (nohistory) ran.history = (await historyJob(sql)).ok;
   if (!(await fresh('wqmis-hierarchy', '7 days'))) ran.hierarchy = (await hierarchyJob(sql)).ok;
   const [{ ungeocoded }] = await sql`select count(*)::int as ungeocoded from wq_area where level = 'gp' and geom is null`;
   if (ungeocoded || !(await fresh('geocode', '30 days'))) ran.geocode = (await geocodeJob(sql)).ok;

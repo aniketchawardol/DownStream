@@ -1,8 +1,9 @@
 // @ts-check
-// CPCB river stations: GeoJSON for the map and 48-hour series for the small multiples.
+// CPCB river stations: GeoJSON for the map, 48-hour series for the small multiples, and daily history.
 import { CPCB_PARAMETERS } from '@lt/core/parsers/cpcb.js';
 import { riverCheck, describeLimit, SPIKE_PARAMETERS } from '@lt/core/thresholds.js';
 import { stationMeta } from '@lt/core/stations.js';
+import { dailyRows, istDaysAgo, bucket, weekOf, r3 } from '../history.js';
 
 export const STALE_RIVER_MS = 6 * 3600_000;
 const PARAMS = Object.keys(CPCB_PARAMETERS);
@@ -97,5 +98,71 @@ export default async function stations(app, { sql, config }) {
     }
     reply.header('cache-control', 'public, max-age=120');
     return { station_no: no, name: st.name, hours, end: end.toISOString(), criteria_class: cls, series: Object.values(series) };
+  });
+
+  const stationParams = { type: 'object', properties: { no: { type: 'string', pattern: '^[A-Z]{2}[0-9]{1,4}$' } }, required: ['no'] };
+  const RANGES = /** @type {Record<string, { days: number, bucket: 'day'|'week' }>} */ ({ '30d': { days: 30, bucket: 'day' }, '1y': { days: 365, bucket: 'day' }, all: { days: 20 * 365, bucket: 'week' } });
+
+  // Daily history: CPCB's daily aggregates back to 2021 plus our own readings for the newest days.
+  // "all" is bucketed by week to keep the response small; the summary always counts days.
+  app.get('/stations/:no/history', {
+    schema: {
+      params: stationParams,
+      querystring: { type: 'object', additionalProperties: false, properties: { range: { type: 'string', enum: Object.keys(RANGES), default: '1y' } } },
+    },
+  }, async (req, reply) => {
+    const { no } = /** @type {any} */ (req.params);
+    const { range } = /** @type {any} */ (req.query);
+    const [st] = await sql`select station_no, name from cpcb_station where station_no = ${no}`;
+    if (!st) return reply.code(404).send({ error: 'not_found', message: `No CPCB station ${no}.` });
+    const { days, bucket: unit } = RANGES[range];
+    const rows = await dailyRows(sql, { stations: [no], from: istDaysAgo(days) });
+    /** @type {Map<string, import('../history.js').DailyRow[]>} */
+    const byParam = new Map();
+    for (const r of rows) (byParam.get(r.parameter) ?? byParam.set(r.parameter, []).get(r.parameter))?.push(r);
+    const params = [...byParam].map(([parameter, list]) => {
+      const limit = riverCheck(parameter, 0, cls)?.limit ?? null;
+      let outside = 0, lowCoverage = 0;
+      /** @type {{ value: number, day: string }|null} */ let lowest = null;
+      /** @type {{ value: number, day: string }|null} */ let highest = null;
+      for (const d of list) {
+        if (d.mean == null) continue;
+        if (riverCheck(parameter, d.mean, cls)?.violation) outside++;
+        if ((d.coverage ?? 100) < 50) lowCoverage++;
+        if (!lowest || d.mean < lowest.value) lowest = { value: d.mean, day: d.day };
+        if (!highest || d.mean > highest.value) highest = { value: d.mean, day: d.day };
+      }
+      const shown = unit === 'week' ? bucket(list, weekOf) : list;
+      return {
+        parameter, label: CPCB_PARAMETERS[/** @type {keyof typeof CPCB_PARAMETERS} */ (parameter)]?.label ?? parameter,
+        unit: displayUnit(parameter, CPCB_PARAMETERS[/** @type {keyof typeof CPCB_PARAMETERS} */ (parameter)]?.unit ?? null),
+        limit, spike_only: SPIKE_PARAMETERS.includes(parameter),
+        points: shown.map((d) => [d.day, r3(d.min), r3(d.mean), r3(d.max), d.coverage == null ? null : Math.round(d.coverage)]),
+        summary: {
+          days: list.length, days_outside: limit ? outside : null, low_coverage_days: lowCoverage,
+          first_day: list[0]?.day ?? null, last_day: list.at(-1)?.day ?? null,
+          lowest: lowest && { value: r3(lowest.value), day: lowest.day }, highest: highest && { value: r3(highest.value), day: highest.day },
+        },
+      };
+    });
+    reply.header('cache-control', 'public, max-age=600');
+    return { station_no: no, name: st.name, range, bucket: unit, criteria_class: cls, params };
+  });
+
+  // Every daily record we hold for a station, one row per day and parameter.
+  app.get('/stations/:no/history.csv', { schema: { params: stationParams } }, async (req, reply) => {
+    const { no } = /** @type {any} */ (req.params);
+    const [st] = await sql`select station_no, name from cpcb_station where station_no = ${no}`;
+    if (!st) return reply.code(404).send({ error: 'not_found', message: `No CPCB station ${no}.` });
+    const rows = await dailyRows(sql, { stations: [no], from: '2000-01-01' });
+    const lines = ['date_ist,parameter,unit,daily_min,daily_mean,daily_max,coverage_percent'];
+    for (const r of rows) {
+      const unit = displayUnit(r.parameter, CPCB_PARAMETERS[/** @type {keyof typeof CPCB_PARAMETERS} */ (r.parameter)]?.unit ?? null) ?? '';
+      lines.push([r.day, r.parameter, unit, r3(r.min), r3(r.mean), r3(r.max), r.coverage == null ? '' : Math.round(r.coverage)].map((v) => (v == null ? '' : String(v))).join(','));
+    }
+    reply.header('content-type', 'text/csv; charset=utf-8')
+      .header('content-disposition', `attachment; filename="cpcb-${no}-daily.csv"`)
+      .header('cache-control', 'public, max-age=3600');
+    return `${lines.join('\n')}\n`;
   });
 }

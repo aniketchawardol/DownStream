@@ -1,0 +1,120 @@
+/* The Ganga view (web/src/ganga.js): a full-screen dialog over the site. Loaded with that module;
+   the button that opens it is styled in components.css. */
+
+html.ganga-open, html.ganga-open body { overflow: hidden; }
+.ganga {
+  position: fixed; inset: 0; z-index: 60; overflow-y: auto; overscroll-behavior: contain;
+  background: var(--page); color: var(--ink);
+  animation: ganga-in .32s cubic-bezier(.2, .7, .2, 1);
+}
+.ganga.leaving { animation: ganga-out .22s ease forwards; }
+@keyframes ganga-in { from { opacity: 0; transform: translateY(14px); } }
+@keyframes ganga-out { to { opacity: 0; transform: translateY(10px); } }
+.ganga-inner { max-width: 1280px; margin: 0 auto; padding: 20px var(--gutter) 48px; }
+.ganga-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.ganga-kicker { font: 600 var(--t14)/1.3 var(--font-ui); color: var(--survey); margin: 0 0 4px; }
+.ganga-head h2 { font: 560 var(--t48)/1.02 var(--font-ui); font-stretch: 78%; letter-spacing: -0.01em; margin: 0; }
+.ganga-head h2:focus { outline: none; }
+.ganga-close { flex: none; }
+.ganga-controls { display: flex; flex-wrap: wrap; gap: 0 28px; margin: 12px 0 0; }
+
+.ganga-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 16px 0 4px; }
+.stat { border-top: 2px solid var(--ink); padding-top: 6px; min-width: 0; }
+.stat .big { display: block; font: 560 var(--t48)/1.05 var(--font-ui); font-stretch: 80%; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat .lab { display: block; font: 400 var(--t14)/1.35 var(--font-ui); color: var(--ink-soft); }
+/* Room for two lines, so the river doesn't jump as the sentence changes while playing. */
+.ganga-headline { font: 400 var(--t18)/1.5 var(--font-body); margin: 8px 0 0; max-width: 72ch; min-height: 3em; }
+
+.ganga-stage { position: relative; margin-top: 4px; }
+.ganga.loading .ganga-stage { opacity: .45; transition: opacity .2s; }
+.ganga-svg { display: block; overflow: visible; }
+.ganga-svg .riverbed { fill: var(--survey-wash); stroke: var(--rule); stroke-width: 1; }
+.ganga-svg .river { opacity: .9; }
+.ganga-svg stop { transition: stop-color .35s ease; }
+.ganga .lane { fill: none; stroke: rgba(255, 255, 255, .88); stroke-linecap: round; }
+.ganga .lane.l0 { stroke-width: 1.4; stroke-dasharray: 1.5 14; }
+.ganga .lane.l1 { stroke-width: 1.9; stroke-dasharray: 3 20; opacity: .8; }
+.ganga .lane.l2 { stroke-width: 1.1; stroke-dasharray: 1 26; opacity: .7; }
+/* Offsets are whole multiples of each dash period, so the loop is seamless. */
+.ganga .current.moving .l0 { animation: ganga-flow0 2.4s linear infinite; }
+.ganga .current.moving .l1 { animation: ganga-flow1 3.4s linear infinite; }
+.ganga .current.moving .l2 { animation: ganga-flow2 4.2s linear infinite; }
+@keyframes ganga-flow0 { to { stroke-dashoffset: -155; } }
+@keyframes ganga-flow1 { to { stroke-dashoffset: -230; } }
+@keyframes ganga-flow2 { to { stroke-dashoffset: -270; } }
+
+.ganga .tie { stroke: var(--rule); stroke-dasharray: 2 3; }
+.ganga .node { cursor: pointer; outline: none; transform-box: fill-box; transform-origin: center; }
+.ganga .node .dot { fill: var(--c, var(--stale)); stroke: var(--page); stroke-width: 2.5; transition: fill .35s ease; }
+.ganga .node:hover .dot, .ganga .node:focus-visible .dot { stroke: var(--ink); stroke-width: 3; }
+.ganga .node .pulse { fill: none; stroke: var(--danger); stroke-width: 2; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.ganga .node[data-status="danger"] .pulse { animation: ganga-pulse 1.8s ease-out infinite; }
+@keyframes ganga-pulse { 0% { opacity: .85; transform: scale(1); } 100% { opacity: 0; transform: scale(2.4); } }
+.ganga .node[data-status="none"] .dot { fill: var(--page); stroke: var(--ink-soft); stroke-dasharray: 2 2; }
+.ganga .place { font: 600 11.5px/1 var(--font-ui); fill: var(--ink); }
+.ganga .vertical .place { font-size: 13.5px; }
+.ganga .km { font: 400 11px/1 var(--font-ui); fill: var(--ink-soft); }
+.ganga .end-label { font: italic 400 12px/1 var(--font-body); fill: var(--ink-soft); }
+.ganga .axis text { font: 400 11px/1 var(--font-ui); fill: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.ganga .axis .grid { stroke: var(--rule-soft); }
+.ganga .band { fill: var(--ok); opacity: .1; }
+.ganga .band-edge { stroke: var(--ok); stroke-dasharray: 4 3; }
+.ganga .band-label { font: 500 10.5px/1 var(--font-ui); fill: var(--ok-ink); }
+.ganga .prof-line { fill: none; stroke: var(--survey); stroke-width: 2.2; stroke-linejoin: round; }
+.ganga .prof-area { fill: var(--survey); opacity: .08; }
+.ganga .pdot { cursor: pointer; }
+.ganga .pdot circle { fill: var(--c, var(--stale)); stroke: var(--page); stroke-width: 2; transition: fill .35s ease; }
+.ganga .pdot text { font: 600 11px/1 var(--font-ui); fill: var(--ink); font-variant-numeric: tabular-nums; }
+.ganga .pdot.missing circle, .ganga .pdot.missing text { opacity: 0; }
+.ganga .vrow { cursor: pointer; }
+.ganga .vrow .hit { fill: transparent; }
+.ganga .vrow:hover .hit { fill: var(--survey-wash); }
+.ganga .vbar { fill: var(--c, var(--stale)); transition: fill .35s ease; }
+.ganga .vval { font: 600 12.5px/1 var(--font-ui); fill: var(--ink); font-variant-numeric: tabular-nums; }
+.ganga .vrow.missing .vval { fill: var(--ink-soft); font-weight: 400; }
+
+/* First open: the river draws itself from source to sea, then the stations pop in. */
+.ganga-svg.reveal .river, .ganga-svg.reveal .riverbed, .ganga-svg.reveal .current { clip-path: inset(0 100% 0 0); transition: clip-path 1.5s cubic-bezier(.45, .05, .2, 1); }
+.ganga-svg.reveal.vertical .river, .ganga-svg.reveal.vertical .riverbed, .ganga-svg.reveal.vertical .current { clip-path: inset(0 0 100% 0); }
+.ganga-svg.reveal.go .river, .ganga-svg.reveal.go .riverbed, .ganga-svg.reveal.go .current { clip-path: inset(0 0 0 0); }
+.ganga-svg.reveal .node { animation: ganga-pop .45s cubic-bezier(.2, .9, .3, 1.35) backwards; animation-delay: calc(450ms + var(--d, 0ms)); }
+.ganga-svg.reveal .place, .ganga-svg.reveal .pdot, .ganga-svg.reveal .vrow, .ganga-svg.reveal .prof-line, .ganga-svg.reveal .prof-area { animation: ganga-fade .6s ease 1.1s backwards; }
+@keyframes ganga-pop { from { opacity: 0; transform: scale(.2); } }
+@keyframes ganga-fade { from { opacity: 0; } }
+
+.ganga-tip {
+  position: absolute; z-index: 3; pointer-events: none; max-width: 250px;
+  background: var(--ink); color: var(--page); border-radius: 6px; padding: 7px 10px;
+  font: 400 var(--t12)/1.45 var(--font-ui);
+}
+.ganga-tip strong { font-size: var(--t14); }
+.ganga-tip small { opacity: .8; }
+
+.ganga-time { display: flex; align-items: center; gap: 14px; margin: 8px 0 0; }
+.ganga-play { min-width: 96px; }
+.ganga-slider { flex: 1; min-width: 0; accent-color: var(--survey); }
+.ganga-date { font: 600 var(--t16)/1.2 var(--font-ui); min-width: 8.5em; text-align: right; font-variant-numeric: tabular-nums; }
+
+.ganga-heat { position: relative; margin: 18px 0 6px; }
+.ganga-heat canvas { display: block; cursor: crosshair; touch-action: none; }
+.heat-marker { position: absolute; top: 0; width: 2px; margin-left: -1px; background: var(--ink); pointer-events: none; }
+.ganga-heat figcaption { font: 400 var(--t14)/1.5 var(--font-ui); color: var(--ink-soft); margin-top: 6px; }
+.ganga-table { margin-top: 8px; }
+.ganga-table > summary { cursor: pointer; font: 600 var(--t16)/1.4 var(--font-ui); padding: 10px 0; border-top: 1px solid var(--rule-soft); }
+.ganga-foot { max-width: 82ch; margin-top: 14px; }
+
+@media (max-width: 899px) {
+  .ganga-head h2 { font-size: var(--t36); }
+  .stat .big { font-size: var(--t24); }
+  .ganga-stats { gap: 10px; }
+  .ganga-headline { font-size: var(--t16); min-height: 6em; }
+  .ganga-time { gap: 10px; }
+  .ganga-date { min-width: 0; font-size: var(--t14); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ganga, .ganga.leaving { animation: none; }
+  .ganga .current .lane, .ganga .node .pulse, .ganga-svg.reveal * { animation: none !important; }
+  .ganga-svg.reveal .river, .ganga-svg.reveal .riverbed, .ganga-svg.reveal .current { clip-path: none; transition: none; }
+  .ganga .node[data-status="danger"] .pulse { opacity: .7; transform: scale(1.5); }
+}

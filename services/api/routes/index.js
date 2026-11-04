@@ -2,6 +2,7 @@
 import { createMailer } from '@lt/core/email/mailer.js';
 import health from './health.js';
 import stations from './stations.js';
+import ganga from './ganga.js';
 import areas from './areas.js';
 import nearby from './nearby.js';
 import subscriptions from './subscriptions.js';
@@ -24,6 +25,7 @@ export default async function routes(app, { prefix: _prefix, ...deps }) {
   });
   await app.register(health, deps);
   await app.register(stations, deps);
+  await app.register(ganga, deps);
   await app.register(areas, deps);
   await app.register(nearby, deps);
   await app.register(subscriptions, { ...deps, mailer });

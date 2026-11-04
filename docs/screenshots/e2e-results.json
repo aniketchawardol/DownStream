@@ -1,76 +1,91 @@
 {
-  "at": "2026-10-24T16:39:18.055Z",
+  "at": "2026-11-04T13:05:26.138Z",
   "base": "http://localhost:8080",
   "results": [
     {
       "name": "screenshots: 1440 px and 390 px, light and dark",
       "ok": true,
-      "ms": 70471
+      "ms": 91292
     },
     {
       "name": "hero sentence is live, dated and names its water",
       "ok": true,
-      "ms": 4682
+      "ms": 7905
     },
     {
       "name": "keyboard only: skip link, list, station panel, alerts pin, subscribe",
       "ok": true,
-      "ms": 6742
+      "ms": 10439
     },
     {
       "name": "keyboard only: use my location, nearby list, panchayat rulers",
       "ok": true,
-      "ms": 6305
+      "ms": 13256
     },
     {
       "name": "location refused: search for a place instead",
       "ok": true,
-      "ms": 5352
+      "ms": 15373
     },
     {
       "name": "laptop: browser location unavailable -> approximate location from the internet connection",
       "ok": true,
-      "ms": 10454
+      "ms": 26429
     },
     {
       "name": "location refused: the IP estimate is offered, never fetched without a click",
       "ok": true,
-      "ms": 6277
+      "ms": 11327
+    },
+    {
+      "name": "station history: charts since 2021, period switch, readable values, CSV",
+      "ok": true,
+      "ms": 5390
+    },
+    {
+      "name": "panchayat history: every sample, month strip, opening an old sample from the table",
+      "ok": true,
+      "ms": 2706
+    },
+    {
+      "name": "the Ganga: opens from the map, plays, picks a station, closes with Escape (desktop and phone)",
+      "ok": true,
+      "ms": 11877
     },
     {
       "name": "testing: \"Use the simulation test point\" and a \"testing\" search both pin the simulation point",
       "ok": true,
-      "ms": 5357
+      "ms": 9712
     },
     {
       "name": "place search stays at the top centre after a pin, a selection and a scroll (desktop and phone)",
       "ok": true,
-      "ms": 12648
+      "ms": 16441
     },
     {
       "name": "map click drops a pin; radius slider redraws; form errors explain what to do",
       "ok": true,
-      "ms": 5553
+      "ms": 11171
     },
     {
       "name": "double opt-in, simulated urgent alert within a minute, one-click unsubscribe",
       "ok": true,
-      "ms": 21347
+      "ms": 44577
     },
     {
       "name": "phone: map on top, bottom sheet snaps, place selection opens the sheet",
       "ok": true,
-      "ms": 5710
+      "ms": 9852
     },
     {
       "name": "reduced motion: no pinned scroll sequence, steps shown statically",
       "ok": true,
-      "ms": 4793
+      "ms": 7327
     },
     {
       "name": "freshness ledger lists each source with fetch time, newest data and records",
       "ok": true,
-      "ms": 4967
+      "ms": 7383
     }
   ]
 }
