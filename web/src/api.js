@@ -45,5 +45,7 @@ export const getLags = () => api('/lags');
 export const getDaily = () => api('/dashboard/daily?days=14');
 /** @param {string} q */
 export const search = (q) => api(`/search?q=${encodeURIComponent(q)}`);
+/** Simulation mode only: broadcast a citizen report from the test point. @param {{ issue: string, water: string, details: string, urgent: boolean }} body */
+export const report = (body) => api('/dev/report', { method: 'POST', body: JSON.stringify(body) });
 /** @param {{ email: string, lat: number, lng: number, radius_km: number, kinds: string[] }} body */
 export const subscribe = (body) => api('/subscriptions', { method: 'POST', body: JSON.stringify(body) });

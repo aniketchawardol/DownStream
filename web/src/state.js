@@ -41,7 +41,7 @@ export function findSelected(sel) {
   if (sel.kind === 'area') return state.areas.find((f) => f.properties.id === sel.id) ?? null;
   if (sel.kind === 'sim') {
     const s = state.config?.mock?.subjects;
-    return [...(s?.stations ?? []), ...(s?.gps ?? [])].find((x) => x.id === sel.id) ?? null;
+    return [...(s?.stations ?? []), ...(s?.gps ?? []), ...(s?.point ? [s.point] : [])].find((x) => x.id === sel.id) ?? null;
   }
   return null;
 }

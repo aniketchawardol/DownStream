@@ -57,11 +57,14 @@ data; `npm run db:reset` wipes it.
    **History** tab of either for everything since 2021 (stations) or every sample (panchayats).
 4. Press **The Ganga** at the top right of the map. Switch between dissolved oxygen and BOD, press Play,
    then click a station on the river to open its history.
-5. Under "Get email alerts", press **Use the simulation test point**, or type "testing" in the place
+5. Under "Get email alerts", press **Use the test point**, or type "testing" in the place
    search. Enter your email and press "Send confirmation email". With a real `SMTP_URL` (see
    docs/RENDER.md) the confirmation arrives in your inbox; with the example settings, in Mailpit. Open it
    and click the link.
 6. Simulated alerts arrive every few minutes, marked `[Simulated]`.
+   To show citizen reporting, press **Report a problem there** (beside **Use the test point**), describe
+   what you saw, tick "People may be at risk now" and press **Broadcast the report**. The report is placed
+   exactly at the test point, so everyone subscribed there gets it, urgent ones within a minute.
 7. Fire an urgent one now:
 
    ```sh

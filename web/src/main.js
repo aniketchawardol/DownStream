@@ -315,6 +315,13 @@ async function boot() {
       setPin(m.lat, m.lng, { fly: true });
       /** @type {HTMLElement} */ (els.subscribe.querySelector('#email')).focus();
     });
+    // Citizen reports, broadcast from the same test point.
+    const { initReport } = await import('./panels/report.js');
+    initReport(/** @type {HTMLDialogElement} */ ($('#report-dialog')), {
+      opener: /** @type {HTMLButtonElement} */ ($('#btn-report')),
+      onBroadcast: () => renderAlerts(els.alerts, openPath),
+      onShow: () => select('sim', 'SIM-POINT'),
+    });
   }
   if (state.config?.criteria_label) {
     document.body.dataset.criteriaLabel = state.config.criteria_label;

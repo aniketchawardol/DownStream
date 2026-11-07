@@ -98,8 +98,10 @@ export function pinMarker() {
 export function mockPointMarker() {
   const el = document.createElement('div');
   el.className = 'mk-mockpoint';
+  el.dataset.kind = 'sim';
+  el.dataset.id = 'SIM-POINT';
   el.setAttribute('aria-hidden', 'true');
-  el.title = 'Simulation point: simulated alerts are placed around here.';
+  el.title = 'Simulation test point: simulated alerts are placed around here, citizen reports exactly here.';
   el.innerHTML = '<svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15"/><circle cx="17" cy="17" r="2.5" style="fill: var(--sim); stroke: none"/></svg>';
   return el;
 }

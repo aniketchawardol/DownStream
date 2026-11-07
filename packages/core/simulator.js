@@ -21,6 +21,8 @@ export function simSubjects(lat = config.mockLat, lng = config.mockLng) {
       { id: 'SIM-GP-2', name: 'Test panchayat SIM-GP-2', ...at(6, 120) },
       { id: 'SIM-GP-3', name: 'Test panchayat SIM-GP-3', ...at(9, 250) },
     ],
+    // The test point itself, where citizen reports are placed (never picked for random alerts).
+    point: { id: 'SIM-POINT', name: 'Simulation test point', lat, lng },
   };
 }
 

@@ -19,6 +19,7 @@ export const ALERT_TEMPLATES = {
   tap_caution: 'A lab test of {source_desc} in {gp} found {findings}. This is within the permissible limit that applies when no other source is available.',
   tap_all_clear: 'A lab test of {source_desc} in {gp} found all tested parameters within limits.',
   tap_overdue: '{title}. Jal Jeevan Mission norms call for {norm}.',
+  citizen_report: 'Someone at {where} reported {what}{details_quote}. Reported at {reported_at}.',
   regional_geogenic: '{parameter_label} was above the permissible limit of {permissible_text} in {count_above} of {count_tested} lab tests within {radius_km} km of your pin this financial year. The closest was {nearest_value} in {nearest_gp}, {nearest_distance} km away. {parameter_label} comes from rock, so it often affects groundwater across a whole area.',
 };
 
@@ -45,8 +46,8 @@ const vu = (v, unit) => (v == null ? '' : `${Number(v).toLocaleString('en-IN', {
 export function alertVars(a, pin) {
   const b = a.body || {};
   const distance_km = Math.round(haversineKm(pin.lat, pin.lng, a.lat, a.lng) * 10) / 10;
-  const where = b.simulated
-    ? (b.water === 'river' ? `river water at ${b.place}` : gpLabel(b.gp_name ?? ''))
+  const where = b.citizen ? b.place
+    : b.simulated ? (b.water === 'river' ? `river water at ${b.place}` : gpLabel(b.gp_name ?? ''))
     : b.water === 'river' ? (b.river ? `the ${b.river} at ${b.place} (river water at CPCB station ${b.station_no})` : `river water at ${b.place} (CPCB station ${b.station_no})`) : gpLabel(b.gp_name ?? '');
   const failing = (b.results || []).filter((/** @type {any} */ r) => r.status === 'above_permissible' || r.status === 'above_acceptable');
   const findings = failing.map((/** @type {any} */ r) => `${r.parameter_label} at ${r.value_text}${r.unit ? ` ${r.unit}` : ''} (acceptable limit ${r.acceptable_text ?? 'not printed'}${r.permissible_text ? `, permissible ${r.permissible_text}` : ''})`).join('; ');
@@ -61,6 +62,8 @@ export function alertVars(a, pin) {
     direction_word: b.direction === 'down' ? 'below' : 'above',
     measured_at: when(b.measured_at),
     last_reading_at: when(b.last_reading_at),
+    reported_at: when(b.reported_at),
+    details_quote: b.details ? `, in their words: “${b.details}”` : '',
     findings: findings || 'results outside the limits',
     source_desc,
     nearest_value: b.nearest ? `${b.nearest.value_text}${b.unit ? ` ${b.unit}` : ''}` : '',
@@ -79,14 +82,16 @@ function renderAlertBlock(a, pin, baseUrl) {
   const b = a.body || {};
   const sentence = fill(ALERT_TEMPLATES[/** @type {keyof typeof ALERT_TEMPLATES} */ (a.kind)] ?? '{title}.', v);
   const severity = a.severity === 'urgent' ? 'Urgent' : a.severity === 'notice' ? 'Notice' : 'For information';
-  const sourceLine = b.simulated
+  const sourceLine = b.citizen
+    ? 'Source: a citizen report made on DownStream. No laboratory or authority has checked it. This one was made at the simulation test point to demonstrate the feature.'
+    : b.simulated
     ? 'Source: the simulator. No real measurement or lab test was made.'
     : kindInfo(a.kind).source === 'cpcb'
     ? 'Source: CPCB real-time river monitoring station. This is river water, not tap water.'
     : b.water === 'groundwater'
       ? 'Source: Jal Jeevan Mission laboratory tests (WQMIS) of drinking-water sources near your pin.'
       : 'Source: Jal Jeevan Mission laboratory test (WQMIS) of a rural drinking-water source.';
-  const whereLine = `Where: ${b.water === 'river' ? `${b.station_name}` : b.simulated ? gpLabel(b.gp_name ?? b.nearest?.gp_name ?? 'a simulated place') : [b.village_name ? `${b.village_name} village` : null, b.gp_name ? gpLabel(b.gp_name) : null, b.block ? `${b.block} block` : null, b.district ? `${b.district} district` : null].filter(Boolean).join(', ') || v.where}, ${v.distance_km} km from your pin.`;
+  const whereLine = b.citizen ? `Where: the simulation test point (${a.lat.toFixed(4)}, ${a.lng.toFixed(4)}), ${v.distance_km} km from your pin.` : `Where: ${b.water === 'river' ? `${b.station_name}` : b.simulated ? gpLabel(b.gp_name ?? b.nearest?.gp_name ?? 'a simulated place') : [b.village_name ? `${b.village_name} village` : null, b.gp_name ? gpLabel(b.gp_name) : null, b.block ? `${b.block} block` : null, b.district ? `${b.district} district` : null].filter(Boolean).join(', ') || v.where}, ${v.distance_km} km from your pin.`;
   const dates = b.water === 'tap' && b.sample_id
     ? `Collected ${day(b.collected_at) ?? 'date not published'}. Analysed ${day(b.analysed_at) ?? 'date not published'}. First seen by this site ${day(b.first_seen_at) ?? 'today'}.`
     : null;

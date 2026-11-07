@@ -4,7 +4,7 @@
 /** @typedef {'urgent'|'notice'|'info'} Severity */
 /** @typedef {'river'|'tap'|'overdue'|'digest'} Group */
 
-/** @type {Record<string, { severity: Severity, group: Group, source: 'cpcb'|'wqmis', label: string }>} */
+/** @type {Record<string, { severity: Severity, group: Group, source: 'cpcb'|'wqmis'|'citizen', label: string }>} */
 export const ALERT_KINDS = {
   river_threshold: { severity: 'urgent', group: 'river', source: 'cpcb', label: 'River reading outside its limit' },
   river_recovered: { severity: 'info', group: 'river', source: 'cpcb', label: 'River reading back within its limit' },
@@ -15,6 +15,8 @@ export const ALERT_KINDS = {
   tap_all_clear: { severity: 'info', group: 'tap', source: 'wqmis', label: 'Tap-water lab test within limits' },
   tap_overdue: { severity: 'notice', group: 'overdue', source: 'wqmis', label: 'Area overdue for a lab test' },
   regional_geogenic: { severity: 'notice', group: 'tap', source: 'wqmis', label: 'Rock-derived contaminant found nearby' },
+  // Severity and group come from the report itself (urgent or not; river or tap); these are the defaults.
+  citizen_report: { severity: 'notice', group: 'river', source: 'citizen', label: 'Citizen report' },
 };
 
 /** The subscribe form's choices, in its own words. */

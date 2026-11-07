@@ -77,7 +77,13 @@
             <h2 id="subscribe-h">Get email alerts</h2>
             <form id="subscribe-form" novalidate>
               <p class="pin-line" id="pin-line">Click the map or use your location to drop a pin.</p>
-              <p class="testpoint" id="testpoint" hidden><button type="button" class="btn-text" id="btn-testpoint">Use the simulation test point</button> to receive simulated alerts, invented every few minutes for testing.</p>
+              <div class="testpoint" id="testpoint" hidden>
+                <div class="testpoint-actions">
+                  <button type="button" class="btn btn-small" id="btn-testpoint">Use the test point</button>
+                  <button type="button" class="btn btn-small" id="btn-report" aria-haspopup="dialog">Report a problem there</button>
+                </div>
+                <p>Subscribe at the test point to receive simulated alerts, invented every few minutes. Or report a problem as a citizen would: it is broadcast from the same point to everyone subscribed there.</p>
+              </div>
               <div class="field">
                 <label for="radius">Alert radius: <output id="radius-out" for="radius">10 km</output></label>
                 <input type="range" id="radius" name="radius" min="1" max="50" step="1" value="10" />
@@ -166,6 +172,45 @@
         </pattern>
       </defs>
     </svg>
+    <!-- Citizen report (simulation mode). Outside the subscribe form: forms can't nest. -->
+    <dialog class="report-dialog" id="report-dialog" aria-labelledby="report-h">
+      <form id="report-form" novalidate>
+        <div class="report-head">
+          <h2 id="report-h">Report a water problem</h2>
+          <button type="button" class="btn-text" data-report-close>Cancel</button>
+        </div>
+        <p class="report-intro">Citizens can warn their neighbours and the authorities when something looks wrong with their water. In this demonstration, every report is placed at the simulation test point and marked as simulated. It goes to everyone subscribed near that point. A real deployment would also send it to the district’s water department.</p>
+        <p class="report-where" id="report-where">Location: the simulation test point</p>
+        <fieldset class="field">
+          <legend>Which water?</legend>
+          <label class="check"><input type="radio" name="water" value="river" checked /> River</label>
+          <label class="check"><input type="radio" name="water" value="tap" /> Tap, handpump or well</label>
+        </fieldset>
+        <div class="field">
+          <label for="report-issue">What did you notice?</label>
+          <select id="report-issue" name="issue">
+            <option value="dead_fish">Dead fish</option>
+            <option value="sewage">Sewage or waste flowing in</option>
+            <option value="colour">Unusual colour</option>
+            <option value="smell">Bad smell</option>
+            <option value="foam">Foam or an oily film</option>
+            <option value="illness">People fell ill after drinking it</option>
+            <option value="other">Something else</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="report-details">Details <span class="optional">(optional, no links)</span></label>
+          <textarea id="report-details" name="details" rows="3" maxlength="280" aria-describedby="report-count" placeholder="For example: dozens of dead fish near the bathing ghat since this morning"></textarea>
+          <p class="hint" id="report-count">0 of 280 characters</p>
+        </div>
+        <label class="check urgent-check"><input type="checkbox" name="urgent" id="report-urgent" /> People may be at risk now. Send it as an urgent alert, emailed within a minute.</label>
+        <p class="hint">Not urgent: subscribers get it in their next alert email, at most one every 15 minutes.</p>
+        <div class="report-actions">
+          <button type="submit" class="btn btn-primary" id="report-submit">Broadcast the report</button>
+        </div>
+        <p class="status-line" id="report-status" role="status"></p>
+      </form>
+    </dialog>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

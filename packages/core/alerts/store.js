@@ -5,7 +5,7 @@ import { kindInfo } from './kinds.js';
 /**
  * @typedef {{ kind: string, source?: string, subject_ref: string, lat: number, lng: number, title: string,
  *   body: Record<string, unknown>, is_mock?: boolean, dedupe_key: string, severity?: 'urgent'|'notice'|'info',
- *   target_subscription_id?: string }} NewAlert
+ *   group?: import('./kinds.js').Group, target_subscription_id?: string }} NewAlert
  */
 
 /**
@@ -18,6 +18,7 @@ import { kindInfo } from './kinds.js';
 export async function createAlert(sql, a) {
   const info = kindInfo(a.kind);
   const severity = a.severity ?? info.severity;
+  const group = a.group ?? info.group;
   const [row] = await sql`
     insert into alert (kind, severity, source, subject_ref, geom, title, body, is_mock, dedupe_key)
     values (${a.kind}, ${severity}, ${a.source ?? info.source}, ${a.subject_ref},
@@ -34,7 +35,7 @@ export async function createAlert(sql, a) {
     from subscription s, alert al
     where al.id = ${row.id}
       and s.confirmed_at is not null and s.unsubscribed_at is null
-      and ${info.group} = any(s.kinds)
+      and ${group} = any(s.kinds)
       and (${severity} <> 'info' or 'digest' = any(s.kinds))
       and (${target}::uuid is null or s.id = ${target}::uuid)
       and (${target}::uuid is not null or ST_DWithin(s.geom, al.geom, s.radius_km * 1000))

@@ -123,7 +123,7 @@ is slow and unreliable.
 
 ## Getting the simulated alerts
 
-On the site, under **Get email alerts**, press **Use the simulation test point** (or search "testing"),
+On the site, under **Get email alerts**, press **Use the test point** (or search "testing"),
 enter your email and press **Send confirmation email**. With the relay set up, the confirmation is sent
 before the page answers, and usually lands within a few seconds. Click its link.
 
@@ -134,6 +134,17 @@ Delivery follows the spec's anti-spam rules:
 - **Urgent** alerts (contamination, a river reading past its limit) are emailed within a minute, always.
 - **Notice** alerts are bundled: at most one email per 15 minutes, and at most `MAX_EMAILS_PER_DAY` (6) a
   day per address. Past the cap they go into the weekly summary.
+
+**Citizen reports.** Beside **Use the test point**, **Report a problem there** opens a form for what a
+resident would report: dead fish, sewage, an unusual colour or smell, people falling ill. Choose river or
+tap water, add up to 280 characters (links are refused), and choose whether it's urgent. The form has no
+location field: the server places every report exactly at the test point (`MOCK_LAT`, `MOCK_LNG`), the
+point the simulated alerts are placed around. It's delivered like any alert to everyone subscribed
+there for that kind of water. Urgent reports are emailed within a minute; others join the next bundled
+email. Reports are marked simulated, appear in Recent alerts, and are listed with the reporter's words on
+the test point's panel (click the dashed circle on the map, or open `/?sim=SIM-POINT`). The endpoint,
+`POST /api/dev/report`, exists only while `MOCK_MODE` is on, and allows 6 reports per 10 minutes per
+visitor.
 
 Each email ends with an unsubscribe link. Mail sent through the relay has no `List-Unsubscribe` header,
 because Apps Script can't set custom headers.

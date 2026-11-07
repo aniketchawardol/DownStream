@@ -9,6 +9,7 @@ import { state } from '../state.js';
 
 /** @param {HTMLElement} root @param {any} subject */
 export async function renderSim(root, subject) {
+  if (subject.id === 'SIM-POINT') return renderTestPoint(root, subject);
   root.innerHTML = `
     <div class="close-row"><p class="kind-line">${rowGlyph('sim', 'none')} <span class="tag-sim">Simulated</span></p>
       <button type="button" class="btn-text" data-close>Close</button></div>
@@ -24,6 +25,28 @@ export async function renderSim(root, subject) {
     list.innerHTML = mine.length
       ? mine.map((/** @type {any} */ a) => `<li class="place-row" style="cursor:default"><span class="name" style="grid-column:1/4">${esc(a.title)}</span><span class="meta">${esc(ago(a.created_at))}</span></li>`).join('')
       : '<li class="note">None in the last week. A new one is invented every few minutes.</li>';
+  } catch { /* the heading is enough */ }
+}
+
+/** The test point itself: citizen reports are placed exactly here. @param {HTMLElement} root @param {any} subject */
+async function renderTestPoint(root, subject) {
+  root.innerHTML = `
+    <div class="close-row"><p class="kind-line">${rowGlyph('sim', 'none')} <span class="tag-sim">Simulated</span></p>
+      <button type="button" class="btn-text" data-close>Close</button></div>
+    <div class="place-head"><h2>Simulation test point</h2><p class="sub"><span class="num">${esc(subject.lat.toFixed(4))}, ${esc(subject.lng.toFixed(4))}</span>. Not a real place.</p></div>
+    <p class="here-row"><button type="button" class="btn" data-alerts-here>Get alerts near here</button> <button type="button" class="btn" data-report-here>Report a problem here</button></p>
+    <p class="water-kind">Simulated alerts are invented for places a few kilometres around this point. Citizen reports made with “Report a problem” are placed exactly here and reach everyone subscribed near it.</p>
+    <h3>Citizen reports here</h3><ol class="near-list report-list" id="point-reports"><li class="note">Loading.</li></ol>`;
+  root.querySelector('[data-report-here]')?.addEventListener('click', () => /** @type {HTMLElement|null} */ (document.querySelector('#btn-report'))?.click());
+  try {
+    const q = new URLSearchParams({ include_mock: 'true', lat: String(subject.lat), lng: String(subject.lng), radius_km: '1', days: '7', limit: '20' });
+    const { alerts } = await getAlerts(q);
+    const list = /** @type {HTMLElement} */ (root.querySelector('#point-reports'));
+    const reports = alerts.filter((/** @type {any} */ a) => a.kind === 'citizen_report');
+    list.innerHTML = reports.length
+      ? reports.map((/** @type {any} */ a) => `<li><p class="report-title"><span class="status-word ${a.severity === 'urgent' ? 'danger' : 'caution'}">${a.severity === 'urgent' ? 'Urgent' : 'Notice'}</span> ${esc(a.title)}</p>
+          ${a.body?.details ? `<blockquote>“${esc(a.body.details)}”</blockquote>` : ''}<p class="meta">${esc(a.body?.water === 'tap' ? 'Tap, handpump or well' : 'River')}, reported ${esc(ago(a.created_at))}</p></li>`).join('')
+      : '<li class="note">No reports in the last week. Use “Report a problem here” to make one.</li>';
   } catch { /* the heading is enough */ }
 }
 

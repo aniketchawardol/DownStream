@@ -79,7 +79,7 @@ export function createMap(container, handlers) {
 
   map.on('click', (e) => {
     const t = /** @type {HTMLElement} */ (e.originalEvent.target);
-    if (t.closest('.mk')) return;
+    if (t.closest('.mk, .mk-mockpoint')) return;
     handlers.onPick(e.lngLat.lat, e.lngLat.lng);
   });
 
@@ -136,7 +136,7 @@ export function createMap(container, handlers) {
         add(`district:${name}`, districtMarker(name, fs.length, Math.max(0, Math.min(1, 1 - (newest - 30) / 335))), [lng, lat]);
       }
       if (config?.mock_mode && config.mock) {
-        add('mock:point', mockPointMarker(), [config.mock.lng, config.mock.lat]);
+        add('sim:SIM-POINT', mockPointMarker(), [config.mock.lng, config.mock.lat]);
         for (const s of config.mock.subjects.stations) add(`sim:${s.id}`, simMarker(s, 'station'), [s.lng, s.lat]);
         for (const s of config.mock.subjects.gps) add(`sim:${s.id}`, simMarker(s, 'gp'), [s.lng, s.lat]);
       }

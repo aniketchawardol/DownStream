@@ -283,6 +283,38 @@ test('POST /api/dev/simulate creates a mock alert that reaches confirmed subscri
   assert.ok(!(await app.inject('/api/alerts')).json().alerts.some((x) => x.is_mock), 'mock alerts hidden unless asked for');
 });
 
+test('POST /api/dev/report: a citizen report broadcast from exactly the test point, to matching subscribers', async (t) => {
+  if (!needDb(t)) return;
+  // A subscriber at the test point who only wants river alerts.
+  await sql`insert into subscription (email, geom, radius_km, kinds, confirmed_at, unsubscribe_token) values ('river-only@example.in', ST_SetSRID(ST_MakePoint(75.7, 16.18), 4326)::geography, 5, '{river}', now(), 'unsub-river-123456')`;
+  const post = (/** @type {any} */ payload) => app.inject({ method: 'POST', url: '/api/dev/report', payload });
+  // The client can't move it: a sent location is dropped and the report still lands on the test point.
+  let r = await post({ issue: 'dead_fish', water: 'river', details: '  Dozens of dead fish\nnear the ghat ', urgent: true, lat: 28.6, lng: 77.2 });
+  assert.equal(r.statusCode, 201);
+  const j = r.json();
+  assert.deepEqual([j.lat, j.lng, j.severity], [16.18, 75.7, 'urgent']);
+  const [a] = await sql`select kind, is_mock, severity, source, title, body, ST_Y(geom::geometry) as lat, ST_X(geom::geometry) as lng from alert where id = ${j.alert_id}`;
+  assert.deepEqual([a.kind, a.is_mock, a.source, a.lat, a.lng], ['citizen_report', true, 'citizen', 16.18, 75.7]);
+  assert.equal(a.body.details, 'Dozens of dead fish near the ghat');
+  const [d] = await sql`select count(*)::int as n from delivery d join subscription s on s.id = d.subscription_id where d.alert_id = ${j.alert_id} and s.email = 'river-only@example.in'`;
+  assert.equal(d.n, 1, 'a river report reaches the river subscriber');
+
+  r = await post({ issue: 'illness', water: 'tap' });
+  const tap = r.json();
+  const [d2] = await sql`select count(*)::int as n from delivery d join subscription s on s.id = d.subscription_id where d.alert_id = ${tap.alert_id} and s.email = 'river-only@example.in'`;
+  assert.equal(d2.n, 0, 'a tap report does not reach someone who only chose river alerts');
+  assert.equal(tap.severity, 'notice');
+
+  r = await post({ issue: 'smell', water: 'river', details: 'see www.example.org for photos' });
+  assert.equal(r.statusCode, 400);
+  assert.equal(r.json().error, 'no_links');
+  assert.equal((await post({ issue: 'other', water: 'river', details: 'hmm' })).json().error, 'need_details');
+  assert.equal((await post({ issue: 'volcano', water: 'river' })).statusCode, 400);
+
+  const pt = (await app.inject('/api/alerts?include_mock=true&lat=16.18&lng=75.7&radius_km=1')).json();
+  assert.ok(pt.alerts.some((/** @type {any} */ x) => x.id === j.alert_id && x.body.details === 'Dozens of dead fish near the ghat'));
+});
+
 test('config, lags, dashboard, search', async (t) => {
   if (!needDb(t)) return;
   const c = (await app.inject('/api/config')).json();

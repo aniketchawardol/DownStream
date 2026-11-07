@@ -339,7 +339,7 @@ await check('the Ganga: opens from the map, plays, picks a station, closes with 
 });
 
 // ---------------------------------------------------------------- the simulation test point
-await check('testing: "Use the simulation test point" and a "testing" search both pin the simulation point', async () => {
+await check('testing: "Use the test point" and a "testing" search both pin the simulation point', async () => {
   const ctx = await browser.newContext(DESKTOP);
   const page = await ctx.newPage();
   await page.goto(BASE);
@@ -461,6 +461,66 @@ await check('double opt-in, simulated urgent alert within a minute, one-click un
   await page.goto(local(unsub));
   await page.waitForSelector('#notice-band:not([hidden])');
   expect(/unsubscribed/i.test(await page.textContent('#notice-band') || ''), 'unsubscribed state');
+  await ctx.close();
+});
+
+await check('citizen report: broadcast from the test point reaches a subscriber there by email', async () => {
+  const ctx = await browser.newContext(DESKTOP);
+  const page = await ctx.newPage();
+  const email = `citizen-${Date.now()}@example.com`;
+  await page.goto(BASE);
+  await ready(page);
+  // Subscribe at the test point and confirm.
+  await page.click('#btn-testpoint');
+  await page.fill('#email', email);
+  await page.click('#subscribe-submit');
+  await page.waitForSelector('#subscribe-status.done', { timeout: 15_000 });
+  const confirm = await mailFor(email, /Confirm/);
+  await page.goto(local((confirm.full.Text.match(/https?:\/\/\S+\/api\/subscriptions\/confirm\?token=\S+/) || [])[0]));
+  await page.waitForSelector('#notice-band:not([hidden])');
+  await ready(page);
+
+  // The second button, beside the first, opens the report form. It has no location field.
+  const box1 = await page.locator('#btn-testpoint').boundingBox();
+  const box2 = await page.locator('#btn-report').boundingBox();
+  expect(box1 && box2 && Math.abs(box1.y - box2.y) < 4 && box2.x > box1.x, 'the two buttons sit side by side');
+  await page.click('#btn-report');
+  await page.waitForSelector('#report-dialog[open]');
+  const where = await page.textContent('#report-where') || '';
+  const cfg = await fetch(`${BASE}/api/config`).then((r) => r.json());
+  expect(where.includes(`${cfg.mock.lat.toFixed(4)}, ${cfg.mock.lng.toFixed(4)}`), `the form names the test point: ${where}`);
+  expect(!(await page.locator('#report-form input[name="lat"], #report-form input[name="lng"]').count()), 'no location field');
+  // Links are refused before anything is sent.
+  await page.fill('#report-details', 'photos at www.example.org');
+  await page.click('#report-submit');
+  expect(/Links and web addresses/.test(await page.textContent('#report-status') || ''), 'link refused');
+  await page.selectOption('#report-issue', 'dead_fish');
+  await page.fill('#report-details', 'Dozens of dead fish near the bathing ghat since this morning');
+  await page.check('#report-urgent');
+  await page.screenshot({ path: new URL('report-dialog-1440.png', OUT).pathname });
+  await page.click('#report-submit');
+  await page.waitForSelector('#report-status.done', { timeout: 15_000 });
+  const status = await page.textContent('#report-status') || '';
+  expect(/Broadcast from the test point\. \d+ subscribers? near it will get it by email within a minute/.test(status), `status: ${status}`);
+
+  // It shows in Recent alerts and on the test point's own panel, with the reporter's words.
+  await page.waitForFunction(() => /Citizen report: dead fish in the river at the test point/.test(document.querySelector('#alerts-list')?.textContent || ''), null, { timeout: 15_000 });
+  await page.click('#report-status [data-report-show]');
+  await page.waitForSelector('#report-dialog', { state: 'hidden' });
+  await page.waitForFunction(() => /Dozens of dead fish/.test(document.querySelector('#point-reports')?.textContent || ''), null, { timeout: 15_000 });
+  expect((await page.textContent('#selected h2')) === 'Simulation test point', 'the test point panel opens');
+  // The column scrolls smoothly to the panel; allow it time to arrive.
+  const scrolled = await page.waitForFunction(() => { const t = /** @type {HTMLElement} */ (document.querySelector('#selected')).getBoundingClientRect().top; return t >= 0 && t < 450; }, null, { timeout: 4000 }).then(() => true, () => false);
+  expect(scrolled, 'the column scrolls to the test point panel');
+  expect(await page.evaluate(() => document.activeElement?.id) === 'selected', 'focus is on the panel, not back on the button');
+  await page.waitForTimeout(1500); // the panel's view transition and the map's flight
+  await page.screenshot({ path: new URL('report-panel-1440.png', OUT).pathname });
+
+  // The email, urgent, within about a minute.
+  const mail = await mailFor(email, /^\[Simulated\] Citizen report: dead fish/, 100_000);
+  expect(/in their words: “Dozens of dead fish near the bathing ghat since this morning”/.test(mail.full.Text), 'email quotes the reporter');
+  expect(/Where: the simulation test point \(/.test(mail.full.Text), 'email names the test point');
+  expect(/No laboratory or authority has checked it/.test(mail.full.Text), 'email says it is unverified');
   await ctx.close();
 });
 

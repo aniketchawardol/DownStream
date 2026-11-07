@@ -1,91 +1,96 @@
 {
-  "at": "2026-11-04T13:05:26.138Z",
+  "at": "2026-11-07T15:13:19.361Z",
   "base": "http://localhost:8080",
   "results": [
     {
       "name": "screenshots: 1440 px and 390 px, light and dark",
       "ok": true,
-      "ms": 91292
+      "ms": 73861
     },
     {
       "name": "hero sentence is live, dated and names its water",
       "ok": true,
-      "ms": 7905
+      "ms": 8702
     },
     {
       "name": "keyboard only: skip link, list, station panel, alerts pin, subscribe",
       "ok": true,
-      "ms": 10439
+      "ms": 7213
     },
     {
       "name": "keyboard only: use my location, nearby list, panchayat rulers",
       "ok": true,
-      "ms": 13256
+      "ms": 21740
     },
     {
       "name": "location refused: search for a place instead",
       "ok": true,
-      "ms": 15373
+      "ms": 11082
     },
     {
       "name": "laptop: browser location unavailable -> approximate location from the internet connection",
       "ok": true,
-      "ms": 26429
+      "ms": 10934
     },
     {
       "name": "location refused: the IP estimate is offered, never fetched without a click",
       "ok": true,
-      "ms": 11327
+      "ms": 6389
     },
     {
       "name": "station history: charts since 2021, period switch, readable values, CSV",
       "ok": true,
-      "ms": 5390
+      "ms": 5142
     },
     {
       "name": "panchayat history: every sample, month strip, opening an old sample from the table",
       "ok": true,
-      "ms": 2706
+      "ms": 4893
     },
     {
       "name": "the Ganga: opens from the map, plays, picks a station, closes with Escape (desktop and phone)",
       "ok": true,
-      "ms": 11877
+      "ms": 10035
     },
     {
-      "name": "testing: \"Use the simulation test point\" and a \"testing\" search both pin the simulation point",
+      "name": "testing: \"Use the test point\" and a \"testing\" search both pin the simulation point",
       "ok": true,
-      "ms": 9712
+      "ms": 6162
     },
     {
       "name": "place search stays at the top centre after a pin, a selection and a scroll (desktop and phone)",
       "ok": true,
-      "ms": 16441
+      "ms": 12896
     },
     {
       "name": "map click drops a pin; radius slider redraws; form errors explain what to do",
       "ok": true,
-      "ms": 11171
+      "ms": 5831
     },
     {
       "name": "double opt-in, simulated urgent alert within a minute, one-click unsubscribe",
       "ok": true,
-      "ms": 44577
+      "ms": 9641
+    },
+    {
+      "name": "citizen report: broadcast from the test point reaches a subscriber there by email",
+      "ok": true,
+      "ms": 58719
     },
     {
       "name": "phone: map on top, bottom sheet snaps, place selection opens the sheet",
       "ok": true,
-      "ms": 9852
+      "ms": 6112
     },
     {
       "name": "reduced motion: no pinned scroll sequence, steps shown statically",
       "ok": true,
-      "ms": 7327
+      "ms": 6341
     },
     {
       "name": "freshness ledger lists each source with fetch time, newest data and records",
       "ok": true,
-      "ms": 7383
+      "ms": 5276
     }
   ]
 }
